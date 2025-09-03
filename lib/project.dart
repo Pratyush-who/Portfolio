@@ -24,7 +24,7 @@ class ProjectsSection extends StatelessWidget {
               'PROJECTS',
               style: GoogleFonts.jetBrainsMono(
                 color: Colors.white,
-                fontSize: 48,
+                fontSize: 28,
                 fontWeight: FontWeight.bold,
                 letterSpacing: 2,
               ),
@@ -33,8 +33,8 @@ class ProjectsSection extends StatelessWidget {
             LayoutBuilder(
               builder: (context, constraints) {
                 return Wrap(
-                  spacing: 24.0,
-                  runSpacing: 24.0,
+                  spacing: 12.0,
+                  runSpacing: 12.0,
                   children: _projects.map((project) {
                     final double itemWidth = screenWidth > 1200
                         ? (constraints.maxWidth - 48) / 3

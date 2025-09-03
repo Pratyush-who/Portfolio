@@ -15,7 +15,7 @@ class LinksSection extends StatelessWidget {
       child: Padding(
         padding: EdgeInsets.symmetric(
           horizontal: screenWidth * 0.12,
-          vertical: 60,
+          vertical: 30,
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -25,29 +25,35 @@ class LinksSection extends StatelessWidget {
               'LINKS',
               style: GoogleFonts.jetBrainsMono(
                 color: Colors.white,
-                fontSize: 48,
+                fontSize: 28,
                 fontWeight: FontWeight.bold,
                 letterSpacing: 2,
               ),
             ),
-            const SizedBox(height: 60),
+            const SizedBox(height: 30),
             isDesktop
-                ? IntrinsicHeight(
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Expanded(flex: 2, child: _buildLinksGrid()),
-                        const SizedBox(width: 80),
-                        Flexible(flex: 1, child: _buildProfileImage()),
-                      ],
-                    ),
+                ? Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(flex: 2, child: _buildLinksGrid()),
+                      const SizedBox(width: 40),
+                      Flexible(
+                        flex: 1,
+                        child: Padding(
+                          padding: const EdgeInsets.only(top: 8),
+                          child: _buildProfileImage(
+                            height: _calculateImageHeight(),
+                          ),
+                        ),
+                      ),
+                    ],
                   )
                 : Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       _buildLinksGrid(),
-                      const SizedBox(height: 40),
-                      _buildProfileImage(),
+                      const SizedBox(height: 16),
+                      _buildProfileImage(height: 180),
                     ],
                   ),
             const SizedBox(height: 40),
@@ -56,6 +62,10 @@ class LinksSection extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  double _calculateImageHeight() {
+    return 160;
   }
 
   Widget _buildLinksGrid() {
@@ -77,7 +87,7 @@ class LinksSection extends StatelessWidget {
                       print('GitHub clicked');
                     },
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 12),
                   _LinkItem(
                     label: '> twitter',
                     onTap: () {
@@ -85,7 +95,7 @@ class LinksSection extends StatelessWidget {
                       print('Twitter clicked');
                     },
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 12),
                   _LinkItem(
                     label: '> linkedin',
                     onTap: () {
@@ -96,7 +106,7 @@ class LinksSection extends StatelessWidget {
                 ],
               ),
             ),
-            const SizedBox(width: 80),
+            const SizedBox(width: 40),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -109,7 +119,7 @@ class LinksSection extends StatelessWidget {
                       print('Email clicked');
                     },
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 12),
                   _LinkItem(
                     label: '> discord',
                     onTap: () {
@@ -117,7 +127,7 @@ class LinksSection extends StatelessWidget {
                       print('Discord clicked');
                     },
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 12),
                   _LinkItem(
                     label: '> calendly',
                     onTap: () {
@@ -134,19 +144,18 @@ class LinksSection extends StatelessWidget {
     );
   }
 
-  Widget _buildProfileImage() {
+  Widget _buildProfileImage({double height = 160}) {
     return ConstrainedBox(
-      constraints: const BoxConstraints(maxWidth: 400, maxHeight: 300),
+      constraints: BoxConstraints(maxWidth: 400, maxHeight: height),
       child: Container(
         width: double.infinity,
-        height: 300,
+        height: height,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(8),
           border: Border.all(color: Colors.grey[700]!, width: 1),
           image: const DecorationImage(
-            // Replace with your actual image URL
             image: NetworkImage(
-              'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=300&fit=crop&crop=face',
+              'https://media1.tenor.com/m/Nt6Zju-KjTsAAAAC/luffy-one-piece.gif',
             ),
             fit: BoxFit.cover,
           ),
@@ -165,7 +174,7 @@ class LinksSection extends StatelessWidget {
           children: [
             Flexible(
               child: Text(
-                '\$ echo "Built with passion for mobile development"',
+                '\$ echo "Built in Flutter , build by who..!!"',
                 style: GoogleFonts.jetBrainsMono(
                   color: Colors.grey[500],
                   fontSize: 14,
@@ -177,7 +186,7 @@ class LinksSection extends StatelessWidget {
             const SizedBox(width: 20),
             Flexible(
               child: Text(
-                '© 2025 BRROCODE Developer Portfolio',
+                '© 2025 Pratyush-Who Developer Portfolio',
                 style: GoogleFonts.jetBrainsMono(
                   color: Colors.grey[500],
                   fontSize: 14,

@@ -7,6 +7,8 @@ class TechstackSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
+    final isDesktop = screenWidth > 1024;
+    final isTablet = screenWidth > 768;
 
     return Container(
       width: double.infinity,
@@ -14,7 +16,7 @@ class TechstackSection extends StatelessWidget {
       child: Padding(
         padding: EdgeInsets.fromLTRB(
           screenWidth * 0.12,
-          24,
+          60,
           screenWidth * 0.12,
           60,
         ),
@@ -26,55 +28,169 @@ class TechstackSection extends StatelessWidget {
               'TECHSTACK',
               style: GoogleFonts.jetBrainsMono(
                 color: Colors.white,
-                fontSize: 48,
+                fontSize: screenWidth < 768 ? 24 : 28,
                 fontWeight: FontWeight.bold,
                 letterSpacing: 2,
               ),
             ),
-            const SizedBox(height: 60),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                _buildTechCategory('FRONTEND', [
-                  'Dart',
-                  'JavaScript',
-                  'Python',
-                  'SQL',
-                  'NoSQL',
-                ]),
-                const SizedBox(height: 50),
-                _buildTechCategory('Frameworks', [
-                  'Flutter',
-                  'OpenCV',
-                  'Selenium',
-                  'Chrome WebDriver',
-                  'BeautifulSoup',
-                  'Finecrawl',
-                  'Firebase',
-                  'REST APIs',
-                  'Google Maps API',
-                  'Hive',
-                  'SqfLite',
-                ]),
-                const SizedBox(height: 50),
-                _buildTechCategory('TOOLS', [
-                  'Git',
-                  'n8n',
-                  'Figma',
-                  'Postman',
-                  'VS Code',
-                  'Android Studio',
-                  'Xcode',
-                  'Canva',
-                ]),
-                const SizedBox(height: 50),
-                _buildCurrentlyLearning(),
-              ],
-            ),
+            const SizedBox(height: 30),
+            isDesktop
+                ? _buildDesktopLayout()
+                : isTablet
+                    ? _buildTabletLayout()
+                    : _buildMobileLayout(),
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildDesktopLayout() {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(
+          flex: 1,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildTechCategory('FRONTEND', [
+                'Dart',
+                'JavaScript',
+                'Python',
+                'SQL',
+                'NoSQL',
+              ]),
+              const SizedBox(height: 60),
+              _buildCurrentlyLearning(),
+            ],
+          ),
+        ),
+        const SizedBox(width: 80),
+        Expanded(
+          flex: 2,
+          child: _buildTechCategory('Frameworks', [
+            'Flutter',
+            'OpenCV',
+            'Selenium',
+            'Chrome WebDriver',
+            'BeautifulSoup',
+            'Finecrawl',
+            'Firebase',
+            'REST APIs',
+            'Google Maps API',
+            'Hive',
+            'SqfLite',
+          ]),
+        ),
+        const SizedBox(width: 80),
+        Expanded(
+          flex: 1,
+          child: _buildTechCategory('TOOLS', [
+            'Git',
+            'n8n',
+            'Figma',
+            'Postman',
+            'VS Code',
+            'Android Studio',
+            'Xcode',
+            'Canva',
+          ]),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildTabletLayout() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              child: _buildTechCategory('FRONTEND', [
+                'Dart',
+                'JavaScript',
+                'Python',
+                'SQL',
+                'NoSQL',
+              ]),
+            ),
+            const SizedBox(width: 40),
+            Expanded(
+              child: _buildTechCategory('TOOLS', [
+                'Git',
+                'n8n',
+                'Figma',
+                'Postman',
+                'VS Code',
+                'Android Studio',
+                'Xcode',
+                'Canva',
+              ]),
+            ),
+          ],
+        ),
+        const SizedBox(height: 40),
+        _buildTechCategory('Frameworks', [
+          'Flutter',
+          'OpenCV',
+          'Selenium',
+          'Chrome WebDriver',
+          'BeautifulSoup',
+          'Finecrawl',
+          'Firebase',
+          'REST APIs',
+          'Google Maps API',
+          'Hive',
+          'SqfLite',
+        ]),
+        const SizedBox(height: 40),
+        _buildCurrentlyLearning(),
+      ],
+    );
+  }
+
+  Widget _buildMobileLayout() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildTechCategory('FRONTEND', [
+          'Dart',
+          'JavaScript',
+          'Python',
+          'SQL',
+          'NoSQL',
+        ]),
+        const SizedBox(height: 40),
+        _buildTechCategory('Frameworks', [
+          'Flutter',
+          'OpenCV',
+          'Selenium',
+          'Chrome WebDriver',
+          'BeautifulSoup',
+          'Finecrawl',
+          'Firebase',
+          'REST APIs',
+          'Google Maps API',
+          'Hive',
+          'SqfLite',
+        ]),
+        const SizedBox(height: 40),
+        _buildTechCategory('TOOLS', [
+          'Git',
+          'n8n',
+          'Figma',
+          'Postman',
+          'VS Code',
+          'Android Studio',
+          'Xcode',
+          'Canva',
+        ]),
+        const SizedBox(height: 40),
+        _buildCurrentlyLearning(),
+      ],
     );
   }
 
@@ -87,21 +203,18 @@ class TechstackSection extends StatelessWidget {
           title,
           style: GoogleFonts.jetBrainsMono(
             color: Colors.white,
-            fontSize: 24,
+            fontSize: 20,
             fontWeight: FontWeight.bold,
             letterSpacing: 1,
           ),
         ),
-        const SizedBox(height: 20),
-        ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: double.infinity),
-          child: Wrap(
-            spacing: 16,
-            runSpacing: 16,
-            children: technologies
-                .map((tech) => _TechChip(technology: tech))
-                .toList(),
-          ),
+        const SizedBox(height: 15),
+        Wrap(
+          spacing: 12,
+          runSpacing: 12,
+          children: technologies
+              .map((tech) => _TechChip(technology: tech))
+              .toList(),
         ),
       ],
     );
@@ -116,21 +229,18 @@ class TechstackSection extends StatelessWidget {
           'CURRENTLY LEARNING',
           style: GoogleFonts.jetBrainsMono(
             color: Colors.white,
-            fontSize: 24,
+            fontSize: 20,
             fontWeight: FontWeight.bold,
             letterSpacing: 1,
           ),
         ),
-        const SizedBox(height: 20),
-        ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: double.infinity),
-          child: Wrap(
-            spacing: 16,
-            runSpacing: 16,
-            children: ['Gen AI', 'python DSA', 'n8n']
-                .map((tech) => _TechChip(technology: tech, isLearning: true))
-                .toList(),
-          ),
+        const SizedBox(height: 15),
+        Wrap(
+          spacing: 12,
+          runSpacing: 12,
+          children: ['Gen AI', 'python DSA', 'n8n']
+              .map((tech) => _TechChip(technology: tech, isLearning: true))
+              .toList(),
         ),
       ],
     );
@@ -157,7 +267,7 @@ class _TechChipState extends State<_TechChip> {
       onExit: (_) => setState(() => _isHovering = false),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
         decoration: BoxDecoration(
           color: _isHovering
               ? const Color(0xFFFF6B35).withOpacity(0.1)

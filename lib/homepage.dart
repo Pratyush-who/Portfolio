@@ -4,6 +4,7 @@ import 'package:portfolioflutter/about.dart';
 import 'package:portfolioflutter/links.dart';
 import 'package:portfolioflutter/project.dart';
 import 'package:portfolioflutter/techstack.dart';
+import 'package:portfolioflutter/getintouch.dart'; // Add this import
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -15,9 +16,9 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final ScrollController _scrollController = ScrollController();
   int _currentPage = 0;
-  final List<GlobalKey> _sectionKeys = List.generate(4, (index) => GlobalKey());
+  final List<GlobalKey> _sectionKeys = List.generate(5, (index) => GlobalKey()); // Updated to 5 sections
 
-  final List<String> _sections = ['ABOUT', 'TECHSTACK', 'PROJECTS', 'LINKS'];
+  final List<String> _sections = ['ABOUT', 'TECHSTACK', 'PROJECTS', 'CONTACT', 'LINKS']; // Updated sections
 
   @override
   void initState() {
@@ -30,11 +31,12 @@ class _HomePageState extends State<HomePage> {
     final scrollOffset = _scrollController.offset;
     final screenHeight = MediaQuery.of(context).size.height;
 
-    // Calculate which section is currently most visible
+    // Calculate which section is currently most visible (updated for 5 sections)
     int newCurrentPage = 0;
     if (scrollOffset > screenHeight * 0.2) newCurrentPage = 1;
     if (scrollOffset > screenHeight * 1.2) newCurrentPage = 2;
     if (scrollOffset > screenHeight * 2.2) newCurrentPage = 3;
+    if (scrollOffset > screenHeight * 3.2) newCurrentPage = 4;
 
     if (newCurrentPage != _currentPage) {
       setState(() {
@@ -133,7 +135,9 @@ class _HomePageState extends State<HomePage> {
             const Divider(color: Color(0xFF333333), thickness: 1, height: 1),
             Container(key: _sectionKeys[2], child: const ProjectsSection()),
             const Divider(color: Color(0xFF333333), thickness: 1, height: 1),
-            Container(key: _sectionKeys[3], child: const LinksSection()),
+            Container(key: _sectionKeys[3], child: const GetInTouchSection()), // Added GetInTouch section
+            const Divider(color: Color(0xFF333333), thickness: 1, height: 1),
+            Container(key: _sectionKeys[4], child: const LinksSection()), // Moved Links to last
           ],
         ),
       ),
