@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'dart:async';
 import 'package:rive/rive.dart';
 import 'package:flutter/services.dart';
+import 'package:portfolioflutter/preload_service.dart';
 
 class AboutSection extends StatefulWidget {
   const AboutSection({super.key});
@@ -10,7 +11,8 @@ class AboutSection extends StatefulWidget {
   State<AboutSection> createState() => _AboutSectionState();
 }
 
-class _AboutSectionState extends State<AboutSection> {
+class _AboutSectionState extends State<AboutSection>
+    with TickerProviderStateMixin {
   bool _isHovering = false;
   String _currentTime = '';
   Timer? _timer;
@@ -20,12 +22,100 @@ class _AboutSectionState extends State<AboutSection> {
   RiveAnimationController? _controller;
   Artboard? _artboard;
 
+  // Typewriter animation variables
+  late AnimationController _typewriterController;
+  late AnimationController _descriptionController;
+  late Animation<int> _typewriterAnimation;
+  late Animation<double> _descriptionAnimation;
+  String _fullText = '\$ flutter_developer --    mobile_specialist';
+  String _displayText = '';
+  bool _showCursor = true;
+  Timer? _cursorTimer;
+
   @override
   void initState() {
     super.initState();
     _updateTime();
     _timer = Timer.periodic(const Duration(seconds: 1), (_) => _updateTime());
-    _initializeAndLoadRive(); // Initialize and load Rive
+
+    // Initialize animation controllers
+    _typewriterController = AnimationController(
+      duration: const Duration(
+        milliseconds: 3000,
+      ), // Slower for more realistic typing
+      vsync: this,
+    );
+
+    _descriptionController = AnimationController(
+      duration: const Duration(milliseconds: 1200),
+      vsync: this,
+    );
+
+    _typewriterAnimation = IntTween(begin: 0, end: _fullText.length).animate(
+      CurvedAnimation(
+        parent: _typewriterController,
+        curve: const Interval(0.0, 1.0, curve: Curves.easeInOut),
+      ),
+    );
+
+    _descriptionAnimation =
+        Tween<double>(
+          begin: 30.0, // Start further down
+          end: 0.0,
+        ).animate(
+          CurvedAnimation(
+            parent: _descriptionController,
+            curve: Curves.easeOutCubic,
+          ),
+        );
+
+    // Start animations
+    _startTypewriterAnimation();
+    _startDescriptionAnimation(); // Start description animation independently
+    _startCursorBlinking();
+    _loadPreloadedRive(); // Use preloaded Rive instead of loading again
+  }
+
+  void _loadPreloadedRive() {
+    // Use preloaded assets from PreloadService
+    if (PreloadService.isPreloaded) {
+      setState(() {
+        _artboard = PreloadService.riveArtboard;
+        _controller = PreloadService.riveController;
+        _riveLoaded = true;
+        _riveError = false;
+      });
+      print('✅ Using preloaded Rive assets');
+    } else {
+      // Fallback to manual loading if preload failed
+      _initializeAndLoadRive();
+    }
+  }
+
+  void _startTypewriterAnimation() {
+    _typewriterAnimation.addListener(() {
+      setState(() {
+        _displayText = _fullText.substring(0, _typewriterAnimation.value);
+      });
+    });
+
+    Future.delayed(const Duration(milliseconds: 500), () {
+      _typewriterController.forward();
+    });
+  }
+
+  void _startDescriptionAnimation() {
+    Future.delayed(const Duration(milliseconds: 1000), () {
+      _descriptionController.forward();
+    });
+  }
+
+  void _startCursorBlinking() {
+    _cursorTimer = Timer.periodic(const Duration(milliseconds: 500), (_) {
+      setState(() {
+        _showCursor = !_showCursor;
+      });
+    });
   }
 
   void _initializeAndLoadRive() async {
@@ -79,6 +169,9 @@ class _AboutSectionState extends State<AboutSection> {
   @override
   void dispose() {
     _timer?.cancel();
+    _cursorTimer?.cancel();
+    _typewriterController.dispose();
+    _descriptionController.dispose();
     _animationController?.dispose();
     super.dispose();
   }
@@ -145,35 +238,73 @@ class _AboutSectionState extends State<AboutSection> {
         mainAxisAlignment: MainAxisAlignment.center,
         mainAxisSize: MainAxisSize.min,
         children: [
+          // Typewriter effect for main title
           Row(
             children: [
               Flexible(
-                child: Text(
-                  '\$ flutter_developer --    mobile_specialist_',
-                  style: GoogleFonts.jetBrainsMono(
-                    color: Colors.white,
-                    fontSize: isDesktop ? 28 : 20,
-                    fontWeight: FontWeight.bold,
-                    height: 1.2,
+                child: RichText(
+                  text: TextSpan(
+                    children: [
+                      TextSpan(
+                        text: _displayText,
+                        style: GoogleFonts.jetBrainsMono(
+                          color: Colors.white,
+                          fontSize: isDesktop ? 28 : 20,
+                          fontWeight: FontWeight.bold,
+                          height: 1.2,
+                        ),
+                      ),
+                      if (_showCursor)
+                        TextSpan(
+                          text: '_',
+                          style: GoogleFonts.jetBrainsMono(
+                            color: const Color(0xFFFF6B35),
+                            fontSize: isDesktop ? 28 : 20,
+                            fontWeight: FontWeight.bold,
+                            height: 1.2,
+                          ),
+                        ),
+                    ],
                   ),
-                  overflow: TextOverflow.visible,
-                  softWrap: true,
                 ),
               ),
             ],
           ),
           const SizedBox(height: 20),
-          Text(
-            'Hi, I am Pratyush Mehra, a Flutter App Developer building cross-platform mobile applications. Specializing in state management, UI/UX design, and scalable app architecture. Building random stuff that somehow makes sense.',
-            style: GoogleFonts.jetBrainsMono(
-              color: Colors.grey[300],
-              fontSize: 18,
-              height: 1.6,
-              letterSpacing: 0.3,
-            ),
+          // Animated description text
+          AnimatedBuilder(
+            animation: _descriptionAnimation,
+            builder: (context, child) {
+              return Transform.translate(
+                offset: Offset(0, _descriptionAnimation.value),
+                child: AnimatedOpacity(
+                  opacity: _descriptionController.isCompleted ? 1.0 : 0.0,
+                  duration: const Duration(milliseconds: 500),
+                  child: Text(
+                    'Hi, I am Pratyush Mehra, a Flutter App Developer building cross-platform mobile applications. Specializing in state management, UI/UX design, and scalable app architecture. Building random stuff that somehow makes sense.',
+                    style: GoogleFonts.jetBrainsMono(
+                      color: Colors.grey[300],
+                      fontSize: isDesktop ? 16 : 14,
+                      height: 1.6,
+                      letterSpacing: 0.3,
+                    ),
+                  ),
+                ),
+              );
+            },
           ),
           const SizedBox(height: 24),
-          _buildStatusRow(),
+          // Animated status row
+          AnimatedBuilder(
+            animation: _descriptionAnimation,
+            builder: (context, child) {
+              return AnimatedOpacity(
+                opacity: _descriptionController.isCompleted ? 1.0 : 0.0,
+                duration: const Duration(milliseconds: 800),
+                child: _buildStatusRow(),
+              );
+            },
+          ),
         ],
       ),
     );
@@ -264,6 +395,55 @@ class _AboutSectionState extends State<AboutSection> {
   }
 
   Widget _buildRiveAnimation() {
+    // If preloaded, show immediately without loading animation
+    if (PreloadService.isPreloaded && _artboard != null) {
+      return MouseRegion(
+        cursor: SystemMouseCursors.click,
+        onEnter: (_) => setState(() => _isHovering = true),
+        onExit: (_) => setState(() => _isHovering = false),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeInOut,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: _isHovering ? const Color(0xFFFF6B35) : Colors.grey[600]!,
+              width: _isHovering ? 3 : 2,
+            ),
+            boxShadow: _isHovering
+                ? [
+                    BoxShadow(
+                      color: const Color(0xFFFF6B35).withOpacity(0.4),
+                      blurRadius: 20,
+                      spreadRadius: 2,
+                      offset: const Offset(0, 0),
+                    ),
+                    BoxShadow(
+                      color: const Color(0xFFFF6B35).withOpacity(0.2),
+                      blurRadius: 35,
+                      spreadRadius: 5,
+                      offset: const Offset(0, 0),
+                    ),
+                  ]
+                : [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.3),
+                      blurRadius: 15,
+                      offset: const Offset(0, 8),
+                    ),
+                  ],
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(14),
+            child: Container(
+              decoration: BoxDecoration(color: Colors.grey[900]),
+              child: Rive(artboard: _artboard!, fit: BoxFit.cover),
+            ),
+          ),
+        ),
+      );
+    }
+
     if (_riveError) {
       return _buildFallbackAnimation();
     }
