@@ -174,7 +174,7 @@ class LinksSection extends StatelessWidget {
           children: [
             Flexible(
               child: Text(
-                '\$ echo "Built in Flutter , build by who..!!"',
+                '\$ echo "Built in Flutter , build without sense...!!!"',
                 style: GoogleFonts.jetBrainsMono(
                   color: Colors.grey[500],
                   fontSize: 14,

@@ -82,10 +82,9 @@ class GetInTouchSection extends StatelessWidget {
                   ],
                 ),
               ),
-              // Overflowing image
               Positioned(
                 right: -10, // Overflow amount
-                top: -76,
+                top: -110,
                 child: Container(
                   width: 350,
                   height: 450,
@@ -118,7 +117,7 @@ class GetInTouchSection extends StatelessWidget {
               Positioned(
                 left: 60,
                 right: 60,
-                bottom: 60,
+                bottom: 40,
                 child: Container(
                   width: double.infinity,
                   padding: const EdgeInsets.all(20),
@@ -141,21 +140,28 @@ class GetInTouchSection extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
+                        '❝',
+                        style: TextStyle(fontSize: 32, color: Colors.white),
+                      ),
+                      Text(
                         '"With great power comes a huge electricity bill."',
                         style: GoogleFonts.inter(
-                          fontSize: 16,
+                          fontSize: 19,
                           fontStyle: FontStyle.italic,
                           color: Colors.white,
-                          height: 1.4,
+                          height: 1.6,
                         ),
                       ),
                       const SizedBox(height: 8),
                       Text(
                         '—   Pratyush-Who',
                         style: GoogleFonts.inter(
-                          fontSize: 12,
-                          color: const Color(0xFF999999),
+                          textStyle: const TextStyle(
+                            fontSize: 12,
+                            color: Color(0xFF999999),
+                          ),
                         ),
+                        textAlign: TextAlign.right,
                       ),
                     ],
                   ),
@@ -381,7 +387,7 @@ class _ContactDialogState extends State<ContactDialog>
       child: SlideTransition(
         position: _slideAnimation,
         child: Dialog(
-          backgroundColor: Colors.transparent,
+          backgroundColor: const Color(0xFF2A3132),
           child: Container(
             width: 500,
             padding: const EdgeInsets.all(40),
