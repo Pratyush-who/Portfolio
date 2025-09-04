@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ProjectsSection extends StatelessWidget {
   const ProjectsSection({super.key});
@@ -67,6 +68,28 @@ class _ProjectCard extends StatefulWidget {
 
 class _ProjectCardState extends State<_ProjectCard> {
   bool _isHovering = false;
+
+  Future<void> _openUrl(String url) async {
+    final uri = Uri.tryParse(url);
+    if (uri == null) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Invalid URL')));
+      return;
+    }
+
+    try {
+      if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Could not open link')));
+      }
+    } catch (_) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Error opening link')));
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -177,9 +200,7 @@ class _ProjectCardState extends State<_ProjectCard> {
                           padding: const EdgeInsets.only(right: 16),
                           child: _LinkButton(
                             text: link.name,
-                            onTap: () {
-                              // Handle link tap
-                            },
+                            onTap: () => _openUrl(link.url),
                           ),
                         ),
                       )
@@ -263,61 +284,93 @@ class ProjectLink {
 
 final List<ProjectModel> _projects = [
   ProjectModel(
-    title: 'Butterflix',
+    title: 'Get-Work',
     description:
-        'Butterflix is an online movie streaming platform that lets you watch the latest films and shows anytime, anywhere, with a smooth and user-friendly experience.',
+        'Get-Work is a platform that connects freelancers with clients looking for their skills. It offers a seamless experience for both parties.',
     technologies: [
       'Flutter',
       'Dart',
-      'Riverpod',
+      'Provider',
+      'Multi-role app',
       'Firebase',
-      'Localization',
+      'Cloudinary',
       'FCM',
-      'Android Native Channel',
-      'Platform-specific Tools',
-    ],
-    links: [ProjectLink(name: 'Play Store', url: '#')],
-  ),
-  ProjectModel(
-    title: 'Pesto',
-    description:
-        'Developed a smart recipe app (Pesto) with offline-first support using SqfLite & Hive. Integrated an AI model that analyzes user eating patterns and suggests personalized dishes for the day.',
-    technologies: [
-      'Flutter',
-      'Riverpod',
-      'Supabase',
-      'sqfLite',
-      'Hive',
-      'Firebase',
-      'Twilio',
-      'swift',
-      'Platform-specific Tools',
+      'Razorpay',
     ],
     links: [
-      ProjectLink(name: 'Play Store', url: '#'),
-      ProjectLink(name: 'App Store', url: '#'),
+      ProjectLink(
+        name: 'GitHub',
+        url: 'https://github.com/Pratyush-who/Get-Work',
+      ),
     ],
   ),
   ProjectModel(
-    title: 'Bulk Result Downloader',
+    title: 'BorkTok',
     description:
-        'I was free enjoying vacation then college results came out so out of curiosity made Python-based CLI tool to download student results in bulk from university portals. It automates fetching results using roll numbers, saving hours of manual work on result day.',
-    technologies: ['Python', 'Requests', 'BeautifulSoup', 'Automation', 'CLI'],
-    links: [ProjectLink(name: 'GitHub', url: '#')],
+        'BorkTok is a social media platform for dog lovers, allowing users to connect with pet owners nearby and a marketplace for pet needs and reporting for lost and found showing location on maps.',
+    technologies: [
+      'Flutter',
+      'Provider',
+      'Cloudinary',
+      'FCM',
+      'Firebase',
+      'Google Maps',
+    ],
+    links: [
+      ProjectLink(
+        name: 'GitHub',
+        url: 'https://github.com/Pratyush-who/Borktok-fyp',
+      ),
+    ],
   ),
   ProjectModel(
-    title: 'Waka Ride',
+    title: 'TrackAI',
+    description:
+        'TrackAI is a Flutter based fitness tracking app that leverages AI to provide personalized workout recommendations and daily goals also focusing on a multi-themed clean UI in dark and light mode.',
+    technologies: ['Flutter', 'Firebase', 'Gemini', 'Dual-Theme'],
+    links: [
+      ProjectLink(
+        name: 'GitHub',
+        url: 'https://github.com/Pratyush-who/TrackAI',
+      ),
+    ],
+  ),
+  ProjectModel(
+    title: 'Snipply',
     status: 'Under Development',
     description:
-        'Waka Ride is a cab-sharing and mobility app built for South...',
-    technologies: ['Flutter', 'Firebase', 'Google Maps'],
-    links: [],
+        'Snipply is a ecom with web admin panel and a Flutter based app with payment gateway and it will be as a c2c ecom platform.',
+    technologies: [
+      'Flutter',
+      'Spring Boot',
+      'JWT',
+      'MongoDB',
+      'RestAPI',
+      'React',
+      'Cloudinary',
+      'Razorpay',
+    ],
+    links: [
+      ProjectLink(
+        name: 'GitHub',
+        url: 'https://github.com/Pratyush-who/Snipply',
+      ),
+    ],
   ),
   ProjectModel(
-    title: 'WordPress',
+    title: 'Cool_buttons_package',
     description:
-        'Built a WordPress & SEO service business with my friend, scaling it from zero to ₹50K+/month. I managed...',
-    technologies: ['WordPress', 'SEO', 'Business'],
-    links: [],
+        'Made a flutter package for pub.dev with some cool animated buttons. Having 400+ total downloads and counting.',
+    technologies: ['Flutter', 'Animation', 'Package Development'],
+    links: [
+      ProjectLink(
+        name: 'GitHub',
+        url: 'https://github.com/Pratyush-who/Cool_buttons_package',
+      ),
+      ProjectLink(
+        name: 'pub.dev',
+        url: 'https://pub.dev/packages/cool_buttons',
+      ),
+    ],
   ),
 ];

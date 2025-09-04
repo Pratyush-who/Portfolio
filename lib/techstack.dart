@@ -1,6 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+// Single source-of-truth for tech categories and currently-learning list.
+// Categories: Languages, Frontend, Backend, Databases, Tools
+final Map<String, List<String>> techStack = {
+  'FRONTEND': [
+    'Flutter',
+    'React',
+    'TailwindCSS',
+    'Bootstrap',
+    'HTML5',
+    'CSS3',
+    'JavaScript',
+  ],
+  'BACKEND': ['Spring Boot', 'Node.js', 'REST APIs', 'JWT'],
+  'DATABASES': ['Firebase', 'PostgreSQL', 'MongoDB', 'Supabase', 'Hive'],
+  'TOOLS': ['Git', 'GitHub', 'Postman', 'VS Code', 'Android Studio'],
+  'LANGUAGES': ['Java', 'Dart', 'JavaScript', 'Python', 'SQL'],
+};
+
 class TechstackSection extends StatelessWidget {
   const TechstackSection({super.key});
 
@@ -37,8 +55,8 @@ class TechstackSection extends StatelessWidget {
             isDesktop
                 ? _buildDesktopLayout()
                 : isTablet
-                    ? _buildTabletLayout()
-                    : _buildMobileLayout(),
+                ? _buildTabletLayout()
+                : _buildMobileLayout(),
           ],
         ),
       ),
@@ -46,151 +64,60 @@ class TechstackSection extends StatelessWidget {
   }
 
   Widget _buildDesktopLayout() {
-    return Row(
+    return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Expanded(
-          flex: 1,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildTechCategory('FRONTEND', [
-                'Dart',
-                'JavaScript',
-                'Python',
-                'SQL',
-                'NoSQL',
-              ]),
-              const SizedBox(height: 60),
-              _buildCurrentlyLearning(),
-            ],
-          ),
-        ),
-        const SizedBox(width: 80),
-        Expanded(
-          flex: 2,
-          child: _buildTechCategory('Frameworks', [
-            'Flutter',
-            'OpenCV',
-            'Selenium',
-            'Chrome WebDriver',
-            'BeautifulSoup',
-            'Finecrawl',
-            'Firebase',
-            'REST APIs',
-            'Google Maps API',
-            'Hive',
-            'SqfLite',
-          ]),
-        ),
-        const SizedBox(width: 80),
-        Expanded(
-          flex: 1,
-          child: _buildTechCategory('TOOLS', [
-            'Git',
-            'n8n',
-            'Figma',
-            'Postman',
-            'VS Code',
-            'Android Studio',
-            'Xcode',
-            'Canva',
-          ]),
-        ),
+        _buildCategoriesGrid(crossAxisCount: 3, childAspectRatio: 1.7),
+        const SizedBox(height: 40),
       ],
     );
   }
 
   Widget _buildTabletLayout() {
+    // Tablet: 2-column grid
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(
-              child: _buildTechCategory('FRONTEND', [
-                'Dart',
-                'JavaScript',
-                'Python',
-                'SQL',
-                'NoSQL',
-              ]),
-            ),
-            const SizedBox(width: 40),
-            Expanded(
-              child: _buildTechCategory('TOOLS', [
-                'Git',
-                'n8n',
-                'Figma',
-                'Postman',
-                'VS Code',
-                'Android Studio',
-                'Xcode',
-                'Canva',
-              ]),
-            ),
-          ],
-        ),
-        const SizedBox(height: 40),
-        _buildTechCategory('Frameworks', [
-          'Flutter',
-          'OpenCV',
-          'Selenium',
-          'Chrome WebDriver',
-          'BeautifulSoup',
-          'Finecrawl',
-          'Firebase',
-          'REST APIs',
-          'Google Maps API',
-          'Hive',
-          'SqfLite',
-        ]),
-        const SizedBox(height: 40),
-        _buildCurrentlyLearning(),
+        _buildCategoriesGrid(crossAxisCount: 2, childAspectRatio: 1.6),
+        const SizedBox(height: 30),
       ],
     );
   }
 
   Widget _buildMobileLayout() {
+    // Mobile: single column grid (effectively stacked)
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildTechCategory('FRONTEND', [
-          'Dart',
-          'JavaScript',
-          'Python',
-          'SQL',
-          'NoSQL',
-        ]),
-        const SizedBox(height: 40),
-        _buildTechCategory('Frameworks', [
-          'Flutter',
-          'OpenCV',
-          'Selenium',
-          'Chrome WebDriver',
-          'BeautifulSoup',
-          'Finecrawl',
-          'Firebase',
-          'REST APIs',
-          'Google Maps API',
-          'Hive',
-          'SqfLite',
-        ]),
-        const SizedBox(height: 40),
-        _buildTechCategory('TOOLS', [
-          'Git',
-          'n8n',
-          'Figma',
-          'Postman',
-          'VS Code',
-          'Android Studio',
-          'Xcode',
-          'Canva',
-        ]),
-        const SizedBox(height: 40),
-        _buildCurrentlyLearning(),
+        _buildCategoriesGrid(crossAxisCount: 1, childAspectRatio: 3.5),
+        const SizedBox(height: 20),
       ],
+    );
+  }
+
+  Widget _buildCategoriesGrid({
+    required int crossAxisCount,
+    double childAspectRatio = 1.6,
+  }) {
+    final categories = [
+      'FRONTEND',
+      'BACKEND',
+      'DATABASES',
+      'TOOLS',
+      'LANGUAGES',
+    ];
+
+    return GridView.count(
+      crossAxisCount: crossAxisCount,
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      mainAxisSpacing: 40,
+      crossAxisSpacing: 40,
+      childAspectRatio: childAspectRatio,
+      children: categories.map((key) {
+        final list = techStack[key] ?? <String>[];
+        return _buildTechCategory(key, list);
+      }).toList(),
     );
   }
 
@@ -220,31 +147,6 @@ class TechstackSection extends StatelessWidget {
     );
   }
 
-  Widget _buildCurrentlyLearning() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Text(
-          'CURRENTLY LEARNING',
-          style: GoogleFonts.jetBrainsMono(
-            color: Colors.white,
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            letterSpacing: 1,
-          ),
-        ),
-        const SizedBox(height: 15),
-        Wrap(
-          spacing: 12,
-          runSpacing: 12,
-          children: ['Gen AI', 'python DSA', 'n8n']
-              .map((tech) => _TechChip(technology: tech, isLearning: true))
-              .toList(),
-        ),
-      ],
-    );
-  }
 }
 
 class _TechChip extends StatefulWidget {

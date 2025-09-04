@@ -2,173 +2,266 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class GetInTouchSection extends StatelessWidget {
   const GetInTouchSection({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isMobile = screenWidth < 800;
+
     return Container(
       width: double.infinity,
       color: Colors.black,
       padding: EdgeInsets.symmetric(
-        horizontal: MediaQuery.of(context).size.width * 0.12,
-        vertical: 120,
+        horizontal: isMobile ? 20 : screenWidth * 0.12,
+        vertical: isMobile ? 40 : 120,
       ),
       child: Column(
         children: [
           // Main container with overflow handling
-          Stack(
-            clipBehavior: Clip.none,
-            children: [
-              // Main card with text content and button
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(60),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20),
-                  color: const Color(0xFF1A1A1A),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.8),
-                      blurRadius: 40,
-                      offset: const Offset(0, 20),
-                    ),
-                  ],
-                ),
-                child: Row(
-                  children: [
-                    // Left side - Text content
-                    Expanded(
-                      flex: 3,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Get in Touch',
-                            style: GoogleFonts.inter(
-                              fontSize: 48,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                              height: 1.2,
-                            ),
-                          ),
-                          const SizedBox(height: 30),
-                          Text(
-                            "I'm always open to discussing new projects, creative\nideas, or opportunities to be part of your vision.\nFeel free to reach out!",
-                            style: GoogleFonts.inter(
-                              fontSize: 18,
-                              color: const Color(0xFFB3B3B3),
-                              height: 1.6,
-                            ),
-                          ),
-                          const SizedBox(height: 40),
-                          _MessageButton(),
-                          const SizedBox(
-                            height: 140,
-                          ), // Extra space for quote card
-                        ],
-                      ),
-                    ),
-                    const SizedBox(width: 40),
-                    // Right side - Spacer for image overflow
-                    Expanded(
-                      flex: 2,
-                      child: Container(
-                        height: 400,
-                        // Empty container to maintain layout
-                      ),
-                    ),
-                  ],
-                ),
+          if (isMobile) ...[
+            // Mobile: render card then quote sequentially to avoid overlap
+            Container(
+              width: double.infinity,
+              padding: EdgeInsets.all(isMobile ? 20 : 60),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(20),
+                color: const Color(0xFF1A1A1A),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.8),
+                    blurRadius: 40,
+                    offset: const Offset(0, 20),
+                  ),
+                ],
               ),
-              Positioned(
-                right: -10, // Overflow amount
-                top: -110,
-                child: Container(
-                  width: 350,
-                  height: 450,
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(12),
-                    child: Image.asset(
-                      'assets/images/download.png',
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) {
-                        print('Error loading image: $error');
-                        return Container(
-                          decoration: const BoxDecoration(
-                            gradient: LinearGradient(
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                              colors: [
-                                Color(0xFF4A4A4A),
-                                Color(0xFF2A2A2A),
-                                Color(0xFF1A1A1A),
-                              ],
-                            ),
-                          ),
-                        );
-                      },
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Get in Touch',
+                    style: GoogleFonts.inter(
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                      height: 1.2,
                     ),
                   ),
-                ),
-              ),
-              // Quote card positioned in front of image
-              Positioned(
-                left: 60,
-                right: 60,
-                bottom: 40,
-                child: Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.9),
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(
-                      color: Colors.white.withOpacity(0.2),
-                      width: 1,
+                  const SizedBox(height: 16),
+                  Text(
+                    "I'm always open to discussing new projects, creative ideas, or opportunities to be part of your vision. Feel free to reach out!",
+                    style: GoogleFonts.inter(
+                      fontSize: 14,
+                      color: const Color(0xFFB3B3B3),
+                      height: 1.6,
                     ),
+                  ),
+                  const SizedBox(height: 20),
+                  _MessageButton(),
+                ],
+              ),
+            ),
+            const SizedBox(height: 20),
+            Container(
+              width: double.infinity,
+              padding: EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.black.withOpacity(0.9),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(
+                  color: Colors.white.withOpacity(0.2),
+                  width: 1,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.5),
+                    blurRadius: 20,
+                    offset: const Offset(0, 10),
+                  ),
+                ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text(
+                    '"With great power comes a huge electricity bill."',
+                    style: GoogleFonts.inter(
+                      fontSize: 16,
+                      fontStyle: FontStyle.italic,
+                      color: Colors.white,
+                      height: 1.6,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    '—   Pratyush-Who',
+                    style: GoogleFonts.inter(
+                      textStyle: const TextStyle(
+                        fontSize: 12,
+                        color: Color(0xFF999999),
+                      ),
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
+            ),
+          ] else ...[
+            Stack(
+              clipBehavior: Clip.none,
+              children: [
+                // Main card with text content and button
+                Container(
+                  width: double.infinity,
+                  padding: EdgeInsets.all(isMobile ? 20 : 60),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(20),
+                    color: const Color(0xFF1A1A1A),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.5),
-                        blurRadius: 20,
-                        offset: const Offset(0, 10),
+                        color: Colors.black.withOpacity(0.8),
+                        blurRadius: 40,
+                        offset: const Offset(0, 20),
                       ),
                     ],
                   ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  child: Row(
                     children: [
-                      Text(
-                        '❝',
-                        style: TextStyle(fontSize: 32, color: Colors.white),
-                      ),
-                      Text(
-                        '"With great power comes a huge electricity bill."',
-                        style: GoogleFonts.inter(
-                          fontSize: 19,
-                          fontStyle: FontStyle.italic,
-                          color: Colors.white,
-                          height: 1.6,
+                      // Left side - Text content
+                      Expanded(
+                        flex: 3,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Get in Touch',
+                              style: GoogleFonts.inter(
+                                fontSize: 48,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                                height: 1.2,
+                              ),
+                            ),
+                            const SizedBox(height: 30),
+                            Text(
+                              "I'm always open to discussing new projects, creative\nideas, or opportunities to be part of your vision.\nFeel free to reach out!",
+                              style: GoogleFonts.inter(
+                                fontSize: 18,
+                                color: const Color(0xFFB3B3B3),
+                                height: 1.6,
+                              ),
+                            ),
+                            const SizedBox(height: 40),
+                            _MessageButton(),
+                            const SizedBox(
+                              height: 140,
+                            ), // Extra space for quote card
+                          ],
                         ),
                       ),
-                      const SizedBox(height: 8),
-                      Text(
-                        '—   Pratyush-Who',
-                        style: GoogleFonts.inter(
-                          textStyle: const TextStyle(
-                            fontSize: 12,
-                            color: Color(0xFF999999),
-                          ),
+                      const SizedBox(width: 40),
+                      // Right side - Spacer for image overflow
+                      Expanded(
+                        flex: 2,
+                        child: Container(
+                          height: 400,
+                          // Empty container to maintain layout
                         ),
-                        textAlign: TextAlign.right,
                       ),
                     ],
                   ),
                 ),
-              ),
-            ],
-          ),
+                Positioned(
+                  right: -10, // Overflow amount
+                  top: -110,
+                  child: Container(
+                    width: 350,
+                    height: 450,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: Image.asset(
+                        'assets/images/download.png',
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          print('Error loading image: $error');
+                          return Container(
+                            decoration: const BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                                colors: [
+                                  Color(0xFF4A4A4A),
+                                  Color(0xFF2A2A2A),
+                                  Color(0xFF1A1A1A),
+                                ],
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                ),
+                Positioned(
+                  left: 60,
+                  right: 60,
+                  bottom: 40,
+                  child: Container(
+                    width: double.infinity,
+                    padding: EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      color: Colors.black.withOpacity(0.9),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(
+                        color: Colors.white.withOpacity(0.2),
+                        width: 1,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.5),
+                          blurRadius: 20,
+                          offset: const Offset(0, 10),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '❝',
+                          style: TextStyle(fontSize: 32, color: Colors.white),
+                        ),
+                        Text(
+                          '"With great power comes a huge electricity bill."',
+                          style: GoogleFonts.inter(
+                            fontSize: 19,
+                            fontStyle: FontStyle.italic,
+                            color: Colors.white,
+                            height: 1.6,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          '—   Pratyush-Who',
+                          style: GoogleFonts.inter(
+                            textStyle: const TextStyle(
+                              fontSize: 12,
+                              color: Color(0xFF999999),
+                            ),
+                          ),
+                          textAlign: TextAlign.right,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
         ],
       ),
     );
@@ -331,13 +424,27 @@ class _ContactDialogState extends State<ContactDialog>
     setState(() => _isSending = true);
 
     try {
-      // EmailJS service configuration
-      const serviceId =
-          'YOUR_SERVICE_ID'; // Replace with your EmailJS service ID
-      const templateId =
-          'YOUR_TEMPLATE_ID'; // Replace with your EmailJS template ID
-      const publicKey =
-          'YOUR_PUBLIC_KEY'; // Replace with your EmailJS public key
+      // EmailJS service configuration (read from .env)
+      final serviceId = dotenv.env['EMAILJS_SERVICE_ID'] ?? '';
+      final templateId = dotenv.env['EMAILJS_TEMPLATE_ID'] ?? '';
+      final publicKey = dotenv.env['EMAILJS_PUBLIC_KEY'] ?? '';
+      final toEmail =
+          dotenv.env['EMAILJS_TO_EMAIL'] ?? 'your-email@example.com';
+
+      if (serviceId.isEmpty || templateId.isEmpty || publicKey.isEmpty) {
+        setState(() => _isSending = false);
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text(
+                'EmailJS credentials are not set. Please add them to your .env file.',
+              ),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+        return;
+      }
 
       final response = await http.post(
         Uri.parse('https://api.emailjs.com/api/v1.0/email/send'),
@@ -348,9 +455,9 @@ class _ContactDialogState extends State<ContactDialog>
           'user_id': publicKey,
           'template_params': {
             'from_name': _nameController.text,
-            'from_email': _emailController.text,
+            'from_email': _emailController.text, // visitor’s email
             'message': _messageController.text,
-            'to_email': 'your-email@example.com', // Replace with your email
+            'to_email': _emailController.text, // 👈 send mail to user
           },
         }),
       );
@@ -361,11 +468,13 @@ class _ContactDialogState extends State<ContactDialog>
           _emailSent = true;
         });
 
-        // Auto close after success
         await Future.delayed(const Duration(seconds: 2));
         if (mounted) Navigator.of(context).pop();
       } else {
-        throw Exception('Failed to send email');
+        print('EmailJS send failed: ${response.statusCode} ${response.body}');
+        throw Exception(
+          'Failed to send email: ${response.statusCode} ${response.body}',
+        );
       }
     } catch (e) {
       setState(() => _isSending = false);
@@ -388,25 +497,31 @@ class _ContactDialogState extends State<ContactDialog>
         position: _slideAnimation,
         child: Dialog(
           backgroundColor: const Color(0xFF2A3132),
-          child: Container(
-            width: 500,
-            padding: const EdgeInsets.all(40),
-            decoration: BoxDecoration(
-              color: const Color(0xFF1A1A1A),
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(
-                color: Colors.white.withOpacity(0.2),
-                width: 1,
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.8),
-                  blurRadius: 40,
-                  offset: const Offset(0, 20),
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final mw = MediaQuery.of(context).size.width;
+              final dialogWidth = mw < 600 ? mw * 0.9 : 600.0;
+              return Container(
+                width: dialogWidth,
+                padding: EdgeInsets.all(mw < 600 ? 20 : 40),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF1A1A1A),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: Colors.white.withOpacity(0.2),
+                    width: 1,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.8),
+                      blurRadius: 40,
+                      offset: const Offset(0, 20),
+                    ),
+                  ],
                 ),
-              ],
-            ),
-            child: _emailSent ? _buildSuccessView() : _buildFormView(),
+                child: _emailSent ? _buildSuccessView() : _buildFormView(),
+              );
+            },
           ),
         ),
       ),

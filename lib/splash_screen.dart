@@ -71,7 +71,6 @@ class _SplashScreenState extends State<SplashScreen>
       );
       if (controller != null) {
         artboard.addController(controller);
-        // Locate any hover-related inputs so we can programmatically trigger them.
         for (final input in controller.inputs) {
           final name = input.name.toLowerCase();
           if (name.contains('hover')) {

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class LinksSection extends StatelessWidget {
   const LinksSection({super.key});
@@ -83,7 +84,7 @@ class LinksSection extends StatelessWidget {
                   _LinkItem(
                     label: '> github',
                     onTap: () {
-                      // Handle GitHub link
+                      launchUrl(Uri.parse('https://github.com/Pratyush-Who'));
                       print('GitHub clicked');
                     },
                   ),
@@ -91,7 +92,7 @@ class LinksSection extends StatelessWidget {
                   _LinkItem(
                     label: '> twitter',
                     onTap: () {
-                      // Handle Twitter link
+                      launchUrl(Uri.parse('https://x.com/o_g_pratyush'));
                       print('Twitter clicked');
                     },
                   ),
@@ -99,7 +100,11 @@ class LinksSection extends StatelessWidget {
                   _LinkItem(
                     label: '> linkedin',
                     onTap: () {
-                      // Handle LinkedIn link
+                      launchUrl(
+                        Uri.parse(
+                          'https://www.linkedin.com/in/pratyushmehra22/',
+                        ),
+                      );
                       print('LinkedIn clicked');
                     },
                   ),
@@ -115,15 +120,24 @@ class LinksSection extends StatelessWidget {
                   _LinkItem(
                     label: '> email',
                     onTap: () {
-                      // Handle Email link
-                      print('Email clicked');
+                      launchUrl(
+                        Uri.parse(
+                          "https://mail.google.com/mail/?view=cm&fs=1&to=pratyushmehra2005@gmail.com",
+                        ),
+                        mode: LaunchMode.externalApplication,
+                      );
                     },
                   ),
+
                   const SizedBox(height: 12),
                   _LinkItem(
                     label: '> discord',
                     onTap: () {
-                      // Handle Discord link
+                      launchUrl(
+                        Uri.parse(
+                          'https://discord.com/users/825183697594613770',
+                        ),
+                      );
                       print('Discord clicked');
                     },
                   ),
@@ -131,7 +145,11 @@ class LinksSection extends StatelessWidget {
                   _LinkItem(
                     label: '> calendly',
                     onTap: () {
-                      // Handle Calendly link
+                      launchUrl(
+                        Uri.parse(
+                          'https://calendly.com/pratyushmehra2005/30min',
+                        ),
+                      );
                       print('Calendly clicked');
                     },
                   ),

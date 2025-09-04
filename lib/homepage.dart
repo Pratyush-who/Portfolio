@@ -4,7 +4,7 @@ import 'package:portfolioflutter/about.dart';
 import 'package:portfolioflutter/links.dart';
 import 'package:portfolioflutter/project.dart';
 import 'package:portfolioflutter/techstack.dart';
-import 'package:portfolioflutter/getintouch.dart'; // Add this import
+import 'package:portfolioflutter/getintouch.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -16,9 +16,18 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final ScrollController _scrollController = ScrollController();
   int _currentPage = 0;
-  final List<GlobalKey> _sectionKeys = List.generate(5, (index) => GlobalKey()); // Updated to 5 sections
-
-  final List<String> _sections = ['ABOUT', 'TECHSTACK', 'PROJECTS', 'CONTACT', 'LINKS']; // Updated sections
+  final List<GlobalKey> _sectionKeys = List.generate(
+    5,
+    (index) => GlobalKey(),
+  ); 
+  
+  final List<String> _sections = [
+    'ABOUT',
+    'TECHSTACK',
+    'PROJECTS',
+    'CONTACT',
+    'LINKS',
+  ];
 
   @override
   void initState() {
@@ -27,16 +36,15 @@ class _HomePageState extends State<HomePage> {
   }
 
   void _onScroll() {
-    // Update current page based on scroll position - simplified for natural scrolling
     final scrollOffset = _scrollController.offset;
     final screenHeight = MediaQuery.of(context).size.height;
 
-    // Calculate which section is currently most visible (updated for 5 sections)
     int newCurrentPage = 0;
     if (scrollOffset > screenHeight * 0.2) newCurrentPage = 1;
     if (scrollOffset > screenHeight * 1.2) newCurrentPage = 2;
     if (scrollOffset > screenHeight * 2.2) newCurrentPage = 3;
-    if (scrollOffset > screenHeight * 3.2) newCurrentPage = 4;
+    if (scrollOffset > screenHeight * 3.0) newCurrentPage = 4;
+    if (scrollOffset > screenHeight * 3.2) newCurrentPage = 5;
 
     if (newCurrentPage != _currentPage) {
       setState(() {
@@ -110,16 +118,19 @@ class _HomePageState extends State<HomePage> {
                   ],
                 ),
                 const Spacer(),
-                ...List.generate(_sections.length, (index) {
-                  return Padding(
-                    padding: const EdgeInsets.only(left: 6),
-                    child: _NavTag(
-                      label: _sections[index],
-                      isActive: _currentPage == index,
-                      onTap: () => _navigateToSection(index),
-                    ),
-                  );
-                }),
+                // On small/mobile widths we remove the top navigation labels
+                // to keep the app bar clean. Use 800px as breakpoint.
+                if (MediaQuery.of(context).size.width > 800)
+                  ...List.generate(_sections.length, (index) {
+                    return Padding(
+                      padding: const EdgeInsets.only(left: 6),
+                      child: _NavTag(
+                        label: _sections[index],
+                        isActive: _currentPage == index,
+                        onTap: () => _navigateToSection(index),
+                      ),
+                    );
+                  }),
               ],
             ),
           ),
@@ -135,9 +146,15 @@ class _HomePageState extends State<HomePage> {
             const Divider(color: Color(0xFF333333), thickness: 1, height: 1),
             Container(key: _sectionKeys[2], child: const ProjectsSection()),
             const Divider(color: Color(0xFF333333), thickness: 1, height: 1),
-            Container(key: _sectionKeys[3], child: const GetInTouchSection()), // Added GetInTouch section
+            Container(
+              key: _sectionKeys[3],
+              child: const GetInTouchSection(),
+            ), // Added GetInTouch section
             const Divider(color: Color(0xFF333333), thickness: 1, height: 1),
-            Container(key: _sectionKeys[4], child: const LinksSection()), // Moved Links to last
+            Container(
+              key: _sectionKeys[4],
+              child: const LinksSection(),
+            ), // Moved Links to last
           ],
         ),
       ),
