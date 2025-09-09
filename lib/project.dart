@@ -33,20 +33,38 @@ class ProjectsSection extends StatelessWidget {
             const SizedBox(height: 60),
             LayoutBuilder(
               builder: (context, constraints) {
-                return Wrap(
-                  spacing: 12.0,
-                  runSpacing: 12.0,
-                  children: _projects.map((project) {
-                    final double itemWidth = screenWidth > 1200
-                        ? (constraints.maxWidth - 48) / 3
-                        : screenWidth > 800
-                        ? (constraints.maxWidth - 24) / 2
-                        : constraints.maxWidth;
-                    return SizedBox(
-                      width: itemWidth,
-                      child: _ProjectCard(project: project),
-                    );
-                  }).toList(),
+                final crossAxisCount = screenWidth >= 1200
+                    ? 3
+                    : screenWidth >= 800
+                    ? 2
+                    : 1;
+                const gap = 12.0;
+                final itemWidth =
+                    (constraints.maxWidth - (crossAxisCount - 1) * gap) /
+                    crossAxisCount;
+
+                // Target uniform height (tweak as needed)
+                final targetHeight = screenWidth >= 1200
+                    ? 360.0
+                    : screenWidth >= 800
+                    ? 380.0
+                    : 400.0;
+
+                final aspectRatio = itemWidth / targetHeight;
+
+                return GridView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: crossAxisCount,
+                    crossAxisSpacing: gap,
+                    mainAxisSpacing: gap,
+                    childAspectRatio: aspectRatio,
+                  ),
+                  itemCount: _projects.length,
+                  itemBuilder: (context, index) {
+                    return _ProjectCard(project: _projects[index]);
+                  },
                 );
               },
             ),
@@ -77,7 +95,6 @@ class _ProjectCardState extends State<_ProjectCard> {
       ).showSnackBar(const SnackBar(content: Text('Invalid URL')));
       return;
     }
-
     try {
       if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
         ScaffoldMessenger.of(
@@ -97,10 +114,13 @@ class _ProjectCardState extends State<_ProjectCard> {
       onEnter: (_) => setState(() => _isHovering = true),
       onExit: (_) => setState(() => _isHovering = false),
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
+        duration: const Duration(milliseconds: 160),
+        curve: Curves.easeOut,
         transform: Matrix4.identity()..scale(_isHovering ? 1.02 : 1.0),
+        padding: EdgeInsets.zero,
         child: Container(
           padding: const EdgeInsets.all(24),
+          // Keep height controlled by Grid childAspectRatio
           decoration: BoxDecoration(
             color: Colors.grey[900],
             border: Border.all(
@@ -112,6 +132,7 @@ class _ProjectCardState extends State<_ProjectCard> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // Header row
               Row(
                 children: [
                   Expanded(
@@ -119,9 +140,11 @@ class _ProjectCardState extends State<_ProjectCard> {
                       widget.project.title,
                       style: GoogleFonts.jetBrainsMono(
                         color: Colors.white,
-                        fontSize: 24,
+                        fontSize: 20,
                         fontWeight: FontWeight.bold,
                       ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
                   if (widget.project.status != null)
@@ -149,50 +172,64 @@ class _ProjectCardState extends State<_ProjectCard> {
                     ),
                 ],
               ),
-              const SizedBox(height: 16),
-              Text(
-                widget.project.description,
-                style: GoogleFonts.jetBrainsMono(
-                  color: Colors.grey[300],
-                  fontSize: 14,
-                  height: 1.5,
+              const SizedBox(height: 10),
+              // Description takes flexible space
+              Expanded(
+                child: Text(
+                  widget.project.description,
+                  style: GoogleFonts.jetBrainsMono(
+                    color: Colors.grey[300],
+                    fontSize: 13,
+                    height: 1.45,
+                  ),
+                  maxLines: 6,
+                  overflow: TextOverflow.ellipsis,
                 ),
-                maxLines: 6,
-                overflow: TextOverflow.ellipsis,
               ),
-              const SizedBox(height: 20),
-              Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                children: widget.project.technologies
-                    .map(
-                      (tech) => Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 6,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.transparent,
-                          border: Border.all(
-                            color: Colors.grey[600]!,
-                            width: 1,
-                          ),
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                        child: Text(
-                          tech,
-                          style: GoogleFonts.jetBrainsMono(
-                            color: Colors.white,
-                            fontSize: 11,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ),
-                    )
-                    .toList(),
+              const SizedBox(height: 12),
+              // Tech chips (limited height via Wrap + SingleChildScrollView if overflow risk)
+              SizedBox(
+                height: 64,
+                child: ScrollConfiguration(
+                  behavior: const _NoGlowBehavior(),
+                  child: SingleChildScrollView(
+                    physics: const ClampingScrollPhysics(),
+                    child: Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: widget.project.technologies
+                          .map(
+                            (tech) => Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 6,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.transparent,
+                                border: Border.all(
+                                  color: Colors.grey[600]!,
+                                  width: 1,
+                                ),
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                              child: Text(
+                                tech,
+                                style: GoogleFonts.jetBrainsMono(
+                                  color: Colors.white,
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ),
+                          )
+                          .toList(),
+                    ),
+                  ),
+                ),
               ),
               if (widget.project.links.isNotEmpty) ...[
-                const SizedBox(height: 16),
+                const SizedBox(height: 12),
+                // Links row pinned at bottom
                 Row(
                   children: widget.project.links
                       .map(
@@ -212,6 +249,18 @@ class _ProjectCardState extends State<_ProjectCard> {
         ),
       ),
     );
+  }
+}
+
+class _NoGlowBehavior extends ScrollBehavior {
+  const _NoGlowBehavior();
+  @override
+  Widget buildViewportChrome(
+    BuildContext context,
+    Widget child,
+    AxisDirection axisDirection,
+  ) {
+    return child;
   }
 }
 

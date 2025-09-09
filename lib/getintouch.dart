@@ -21,9 +21,9 @@ class GetInTouchSection extends StatelessWidget {
       ),
       child: Column(
         children: [
-          // Main container with overflow handling
+           
           if (isMobile) ...[
-            // Mobile: render card then quote sequentially to avoid overlap
+             
             Container(
               width: double.infinity,
               padding: EdgeInsets.all(isMobile ? 20 : 60),
@@ -114,7 +114,7 @@ class GetInTouchSection extends StatelessWidget {
             Stack(
               clipBehavior: Clip.none,
               children: [
-                // Main card with text content and button
+                 
                 Container(
                   width: double.infinity,
                   padding: EdgeInsets.all(isMobile ? 20 : 60),
@@ -131,7 +131,7 @@ class GetInTouchSection extends StatelessWidget {
                   ),
                   child: Row(
                     children: [
-                      // Left side - Text content
+                       
                       Expanded(
                         flex: 3,
                         child: Column(
@@ -159,24 +159,24 @@ class GetInTouchSection extends StatelessWidget {
                             _MessageButton(),
                             const SizedBox(
                               height: 140,
-                            ), // Extra space for quote card
+                            ),  
                           ],
                         ),
                       ),
                       const SizedBox(width: 40),
-                      // Right side - Spacer for image overflow
+                       
                       Expanded(
                         flex: 2,
                         child: Container(
                           height: 400,
-                          // Empty container to maintain layout
+                           
                         ),
                       ),
                     ],
                   ),
                 ),
                 Positioned(
-                  right: -10, // Overflow amount
+                  right: -10,  
                   top: -110,
                   child: Container(
                     width: 350,
@@ -424,7 +424,7 @@ class _ContactDialogState extends State<ContactDialog>
     setState(() => _isSending = true);
 
     try {
-      // EmailJS service configuration (read from .env)
+       
       final serviceId = dotenv.env['EMAILJS_SERVICE_ID'] ?? '';
       final templateId = dotenv.env['EMAILJS_TEMPLATE_ID'] ?? '';
       final publicKey = dotenv.env['EMAILJS_PUBLIC_KEY'] ?? '';
@@ -455,9 +455,9 @@ class _ContactDialogState extends State<ContactDialog>
           'user_id': publicKey,
           'template_params': {
             'from_name': _nameController.text,
-            'from_email': _emailController.text, // visitor’s email
+            'from_email': _emailController.text,
             'message': _messageController.text,
-            'to_email': _emailController.text, // 👈 send mail to user
+            'to_email': _emailController.text, 
           },
         }),
       );
@@ -597,7 +597,7 @@ class _ContactDialogState extends State<ContactDialog>
           ),
           const SizedBox(height: 32),
 
-          // Name Field
+           
           _buildTextField(
             controller: _nameController,
             label: 'Your Name',
@@ -611,7 +611,7 @@ class _ContactDialogState extends State<ContactDialog>
           ),
           const SizedBox(height: 20),
 
-          // Email Field
+           
           _buildTextField(
             controller: _emailController,
             label: 'Your Email',
@@ -629,7 +629,7 @@ class _ContactDialogState extends State<ContactDialog>
           ),
           const SizedBox(height: 20),
 
-          // Message Field
+           
           _buildTextField(
             controller: _messageController,
             label: 'Your Message',
@@ -644,7 +644,7 @@ class _ContactDialogState extends State<ContactDialog>
           ),
           const SizedBox(height: 32),
 
-          // Send Button
+           
           SizedBox(
             width: double.infinity,
             child: ElevatedButton(
