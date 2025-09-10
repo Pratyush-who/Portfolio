@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-// Single source-of-truth for tech categories and currently-learning list.
-// Categories: Languages, Frontend, Backend, Databases, Tools
+// Single source-of-truth for tech categories
 final Map<String, List<String>> techStack = {
   'FRONTEND': [
     'Flutter',
@@ -24,81 +23,54 @@ class TechstackSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final isDesktop = screenWidth > 1024;
-    final isTablet = screenWidth > 768;
+    final w = MediaQuery.of(context).size.width;
+    final isMobile = w < 640;
+    final isTablet = w >= 640 && w < 1024;
+
+    final horizontalPadding = isMobile ? 24.0 : w * 0.12;
 
     return Container(
       width: double.infinity,
       color: Colors.black,
-      child: Padding(
-        padding: EdgeInsets.fromLTRB(
-          screenWidth * 0.12,
-          60,
-          screenWidth * 0.12,
-          60,
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              'TECHSTACK',
-              style: GoogleFonts.jetBrainsMono(
-                color: Colors.white,
-                fontSize: screenWidth < 768 ? 24 : 28,
-                fontWeight: FontWeight.bold,
-                letterSpacing: 2,
-              ),
+      padding: EdgeInsets.fromLTRB(
+        horizontalPadding,
+        60,
+        horizontalPadding,
+        60,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            'TECHSTACK',
+            style: GoogleFonts.jetBrainsMono(
+              color: Colors.white,
+              fontSize: isMobile ? 24 : 28,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 2,
             ),
-            const SizedBox(height: 30),
-            isDesktop
-                ? _buildDesktopLayout()
+          ),
+          const SizedBox(height: 36),
+          _ResponsiveCategories(
+            crossAxisCount: isMobile
+                ? 1
                 : isTablet
-                ? _buildTabletLayout()
-                : _buildMobileLayout(),
-          ],
-        ),
+                ? 2
+                : 3,
+          ),
+        ],
       ),
     );
   }
+}
 
-  Widget _buildDesktopLayout() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _buildCategoriesGrid(crossAxisCount: 3, childAspectRatio: 1.7),
-        const SizedBox(height: 40),
-      ],
-    );
-  }
+class _ResponsiveCategories extends StatelessWidget {
+  final int crossAxisCount;
+  const _ResponsiveCategories({required this.crossAxisCount});
 
-  Widget _buildTabletLayout() {
-    // Tablet: 2-column grid
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _buildCategoriesGrid(crossAxisCount: 2, childAspectRatio: 1.6),
-        const SizedBox(height: 30),
-      ],
-    );
-  }
-
-  Widget _buildMobileLayout() {
-    // Mobile: single column grid (effectively stacked)
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _buildCategoriesGrid(crossAxisCount: 1, childAspectRatio: 3.5),
-        const SizedBox(height: 20),
-      ],
-    );
-  }
-
-  Widget _buildCategoriesGrid({
-    required int crossAxisCount,
-    double childAspectRatio = 1.6,
-  }) {
+  @override
+  Widget build(BuildContext context) {
     final categories = [
       'FRONTEND',
       'BACKEND',
@@ -107,53 +79,79 @@ class TechstackSection extends StatelessWidget {
       'LANGUAGES',
     ];
 
-    return GridView.count(
-      crossAxisCount: crossAxisCount,
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      mainAxisSpacing: 40,
-      crossAxisSpacing: 40,
-      childAspectRatio: childAspectRatio,
-      children: categories.map((key) {
-        final list = techStack[key] ?? <String>[];
-        return _buildTechCategory(key, list);
-      }).toList(),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        const gap = 40.0;
+        final width = constraints.maxWidth;
+        final itemWidth = crossAxisCount == 1
+            ? width
+            : (width - (crossAxisCount - 1) * gap) / crossAxisCount;
+
+        return Wrap(
+          spacing: gap,
+          runSpacing: gap,
+          children: categories.map((key) {
+            final techs = techStack[key] ?? [];
+            return SizedBox(
+              width: itemWidth,
+              child: _TechCategoryCard(title: key, technologies: techs),
+            );
+          }).toList(),
+        );
+      },
     );
   }
+}
 
-  Widget _buildTechCategory(String title, List<String> technologies) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Text(
-          title,
-          style: GoogleFonts.jetBrainsMono(
-            color: Colors.white,
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            letterSpacing: 1,
+class _TechCategoryCard extends StatelessWidget {
+  final String title;
+  final List<String> technologies;
+
+  const _TechCategoryCard({required this.title, required this.technologies});
+
+  @override
+  Widget build(BuildContext context) {
+    final w = MediaQuery.of(context).size.width;
+    final isMobile = w < 640;
+
+    return Container(
+      padding: const EdgeInsets.fromLTRB(18, 18, 18, 14),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            title,
+            style: GoogleFonts.jetBrainsMono(
+              color: Colors.white,
+              fontSize: isMobile ? 18 : 20,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 1,
+            ),
           ),
-        ),
-        const SizedBox(height: 15),
-        Wrap(
-          spacing: 12,
-          runSpacing: 12,
-          children: technologies
-              .map((tech) => _TechChip(technology: tech))
-              .toList(),
-        ),
-      ],
+          const SizedBox(height: 14),
+          Wrap(
+            spacing: 12,
+            runSpacing: 12,
+            children: technologies
+                .map((t) => _TechChip(technology: t, compact: isMobile))
+                .toList(),
+          ),
+        ],
+      ),
     );
   }
-
 }
 
 class _TechChip extends StatefulWidget {
   final String technology;
   final bool isLearning;
+  final bool compact;
 
-  const _TechChip({required this.technology, this.isLearning = false});
+  const _TechChip({
+    required this.technology,
+    this.isLearning = false,
+    this.compact = false,
+  });
 
   @override
   State<_TechChip> createState() => _TechChipState();
@@ -164,12 +162,16 @@ class _TechChipState extends State<_TechChip> {
 
   @override
   Widget build(BuildContext context) {
+    final fontSize = widget.compact ? 12.0 : 14.0;
+    final vPad = widget.compact ? 4.0 : 5.0;
+    final hPad = widget.compact ? 10.0 : 12.0;
+
     return MouseRegion(
       onEnter: (_) => setState(() => _isHovering = true),
       onExit: (_) => setState(() => _isHovering = false),
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+        duration: const Duration(milliseconds: 160),
+        padding: EdgeInsets.symmetric(horizontal: hPad, vertical: vPad),
         decoration: BoxDecoration(
           color: _isHovering
               ? const Color(0xFFFF6B35).withOpacity(0.1)
@@ -180,7 +182,7 @@ class _TechChipState extends State<_TechChip> {
                 : _isHovering
                 ? const Color(0xFFFF6B35)
                 : Colors.grey[600]!,
-            width: 1.5,
+            width: 1.2,
           ),
           borderRadius: BorderRadius.circular(6),
         ),
@@ -192,7 +194,7 @@ class _TechChipState extends State<_TechChip> {
                 : _isHovering
                 ? const Color(0xFFFF6B35)
                 : Colors.white,
-            fontSize: 14,
+            fontSize: fontSize,
             fontWeight: FontWeight.w500,
             letterSpacing: 0.5,
           ),
