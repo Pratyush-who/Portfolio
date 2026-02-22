@@ -6,7 +6,11 @@ import 'package:portfolioflutter/splash_screen.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  await dotenv.load(fileName: '.env');
+  try {
+    await dotenv.load(fileName: '.env');
+  } catch (_) {
+    // .env not bundled (e.g. production build without .env asset)
+  }
 
   await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
