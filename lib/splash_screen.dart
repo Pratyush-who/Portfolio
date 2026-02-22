@@ -21,7 +21,22 @@ class _SplashScreenState extends State<SplashScreen>
   late Animation<double> _exitAnimation;
 
   Artboard? _splashArtboard;
+  StateMachineController? _splashController;
   bool _splashRiveLoaded = false;
+  bool _isHoveringRive = false;
+
+  // Known hover input names to try
+  static const _hoverInputNames = [
+    'Hover',
+    'hover',
+    'isHover',
+    'isHovered',
+    'Hovered',
+    'hovered',
+    'MouseOver',
+    'mouseOver',
+    'mouse_over',
+  ];
 
   @override
   void initState() {
@@ -58,25 +73,26 @@ class _SplashScreenState extends State<SplashScreen>
       final file = RiveFile.import(byteData);
       final artboard = file.mainArtboard;
 
-      // Try to attach first state machine or fall back to first animation
-      bool controllerAdded = false;
+      StateMachineController? controller;
       for (final sm in artboard.stateMachines) {
-        final controller = StateMachineController.fromArtboard(
-          artboard,
-          sm.name,
-        );
-        if (controller != null) {
-          artboard.addController(controller);
-          controllerAdded = true;
+        final c = StateMachineController.fromArtboard(artboard, sm.name);
+        if (c != null) {
+          artboard.addController(c);
+          controller = c;
+          // Print all inputs for debugging
+          for (final input in c.inputs) {
+            print('🎮 Rive input: "${input.name}" (${input.runtimeType})');
+          }
           break;
         }
       }
-      if (!controllerAdded && artboard.animations.isNotEmpty) {
+      if (controller == null && artboard.animations.isNotEmpty) {
         artboard.addController(SimpleAnimation(artboard.animations.first.name));
       }
 
       setState(() {
         _splashArtboard = artboard;
+        _splashController = controller;
         _splashRiveLoaded = true;
       });
     } catch (e) {
@@ -84,6 +100,40 @@ class _SplashScreenState extends State<SplashScreen>
       setState(() {
         _splashRiveLoaded = false;
       });
+    }
+  }
+
+  void _onRiveHover(bool hovering) {
+    if (_splashController == null || _isHoveringRive == hovering) return;
+    _isHoveringRive = hovering;
+
+    for (final input in _splashController!.inputs) {
+      // Try boolean inputs matching known hover names
+      if (input is SMIBool &&
+          _hoverInputNames.any(
+            (name) => name.toLowerCase() == input.name.toLowerCase(),
+          )) {
+        input.value = hovering;
+        return;
+      }
+    }
+
+    // Fallback: fire trigger with hover-like name
+    for (final input in _splashController!.inputs) {
+      if (input is SMITrigger &&
+          _hoverInputNames.any(
+            (name) => name.toLowerCase() == input.name.toLowerCase(),
+          )) {
+        if (hovering) input.fire();
+        return;
+      }
+    }
+
+    // Last fallback: toggle all boolean inputs
+    for (final input in _splashController!.inputs) {
+      if (input is SMIBool) {
+        input.value = hovering;
+      }
     }
   }
 
@@ -123,6 +173,7 @@ class _SplashScreenState extends State<SplashScreen>
   void dispose() {
     _fadeController.dispose();
     _exitController.dispose();
+    _splashController?.dispose();
     super.dispose();
   }
 
@@ -163,9 +214,14 @@ class _SplashScreenState extends State<SplashScreen>
                             minHeight: 350,
                           ),
                           child: _splashRiveLoaded && _splashArtboard != null
-                              ? Rive(
-                                  artboard: _splashArtboard!,
-                                  fit: BoxFit.contain,
+                              ? MouseRegion(
+                                  cursor: SystemMouseCursors.click,
+                                  onEnter: (_) => _onRiveHover(true),
+                                  onExit: (_) => _onRiveHover(false),
+                                  child: Rive(
+                                    artboard: _splashArtboard!,
+                                    fit: BoxFit.contain,
+                                  ),
                                 )
                               : Container(
                                   decoration: BoxDecoration(
