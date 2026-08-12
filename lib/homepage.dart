@@ -5,6 +5,8 @@ import 'package:portfolioflutter/links.dart';
 import 'package:portfolioflutter/project.dart';
 import 'package:portfolioflutter/techstack.dart';
 import 'package:portfolioflutter/getintouch.dart';
+import 'package:portfolioflutter/experience.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -17,13 +19,14 @@ class _HomePageState extends State<HomePage> {
   final ScrollController _scrollController = ScrollController();
   int _currentPage = 0;
   final List<GlobalKey> _sectionKeys = List.generate(
-    5,
+    6,
     (index) => GlobalKey(),
   ); 
   
   final List<String> _sections = [
     'ABOUT',
     'TECHSTACK',
+    'EXPERIENCE',
     'PROJECTS',
     'CONTACT',
     'LINKS',
@@ -40,11 +43,11 @@ class _HomePageState extends State<HomePage> {
     final screenHeight = MediaQuery.of(context).size.height;
 
     int newCurrentPage = 0;
-    if (scrollOffset > screenHeight * 0.2) newCurrentPage = 1;
-    if (scrollOffset > screenHeight * 1.2) newCurrentPage = 2;
-    if (scrollOffset > screenHeight * 2.2) newCurrentPage = 3;
-    if (scrollOffset > screenHeight * 3.0) newCurrentPage = 4;
-    if (scrollOffset > screenHeight * 3.2) newCurrentPage = 5;
+    if (scrollOffset > screenHeight * 0.2) newCurrentPage = 1; // Techstack
+    if (scrollOffset > screenHeight * 1.2) newCurrentPage = 2; // Experience
+    if (scrollOffset > screenHeight * 2.2) newCurrentPage = 3; // Projects
+    if (scrollOffset > screenHeight * 3.2) newCurrentPage = 4; // Contact
+    if (scrollOffset > screenHeight * 4.0) newCurrentPage = 5; // Links
 
     if (newCurrentPage != _currentPage) {
       setState(() {
@@ -76,7 +79,9 @@ class _HomePageState extends State<HomePage> {
           color: Colors.black,
           child: Padding(
             padding: EdgeInsets.symmetric(
-              horizontal: MediaQuery.of(context).size.width * 0.12,
+              horizontal: MediaQuery.of(context).size.width > 950 
+                  ? MediaQuery.of(context).size.width * 0.12 
+                  : 20,
               vertical: 20,
             ),
             child: Row(
@@ -119,8 +124,8 @@ class _HomePageState extends State<HomePage> {
                 ),
                 const Spacer(),
                 // On small/mobile widths we remove the top navigation labels
-                // to keep the app bar clean. Use 800px as breakpoint.
-                if (MediaQuery.of(context).size.width > 800)
+                // to keep the app bar clean. Use 950px as breakpoint.
+                if (MediaQuery.of(context).size.width > 950) ...[
                   ...List.generate(_sections.length, (index) {
                     return Padding(
                       padding: const EdgeInsets.only(left: 6),
@@ -131,6 +136,9 @@ class _HomePageState extends State<HomePage> {
                       ),
                     );
                   }),
+                  const SizedBox(width: 16),
+                  _ResumeButton(),
+                ],
               ],
             ),
           ),
@@ -140,19 +148,24 @@ class _HomePageState extends State<HomePage> {
         controller: _scrollController,
         child: Column(
           children: [
-            Container(key: _sectionKeys[0], child: const AboutSection()),
+            Container(
+              key: _sectionKeys[0],
+              child: AboutSection(onContactTap: () => _navigateToSection(4)),
+            ),
             const Divider(color: Color(0xFF333333), thickness: 1, height: 1),
             Container(key: _sectionKeys[1], child: const TechstackSection()),
             const Divider(color: Color(0xFF333333), thickness: 1, height: 1),
-            Container(key: _sectionKeys[2], child: const ProjectsSection()),
+            Container(key: _sectionKeys[2], child: const ExperienceSection()),
+            const Divider(color: Color(0xFF333333), thickness: 1, height: 1),
+            Container(key: _sectionKeys[3], child: const ProjectsSection()),
             const Divider(color: Color(0xFF333333), thickness: 1, height: 1),
             Container(
-              key: _sectionKeys[3],
+              key: _sectionKeys[4],
               child: const GetInTouchSection(),
             ), // Added GetInTouch section
             const Divider(color: Color(0xFF333333), thickness: 1, height: 1),
             Container(
-              key: _sectionKeys[4],
+              key: _sectionKeys[5],
               child: const LinksSection(),
             ), // Moved Links to last
           ],
@@ -214,3 +227,47 @@ class _NavTagState extends State<_NavTag> {
     );
   }
 }
+
+class _ResumeButton extends StatefulWidget {
+  @override
+  State<_ResumeButton> createState() => _ResumeButtonState();
+}
+
+class _ResumeButtonState extends State<_ResumeButton> {
+  bool _isHovering = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return MouseRegion(
+      onEnter: (_) => setState(() => _isHovering = true),
+      onExit: (_) => setState(() => _isHovering = false),
+      child: GestureDetector(
+        onTap: () async {
+          final uri = Uri.parse('https://dub.sh/pratyush');
+          if (await canLaunchUrl(uri)) {
+            await launchUrl(uri);
+          }
+        },
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          decoration: BoxDecoration(
+            color: _isHovering ? const Color(0xFFFF6B35).withOpacity(0.1) : Colors.transparent,
+            border: Border.all(color: const Color(0xFFFF6B35), width: 1.5),
+            borderRadius: BorderRadius.circular(4),
+          ),
+          child: Text(
+            'Resume',
+            style: GoogleFonts.jetBrainsMono(
+              color: const Color(0xFFFF6B35),
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 0.5,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+

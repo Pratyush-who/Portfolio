@@ -21,9 +21,7 @@ class GetInTouchSection extends StatelessWidget {
       ),
       child: Column(
         children: [
-           
           if (isMobile) ...[
-             
             Container(
               width: double.infinity,
               padding: EdgeInsets.all(isMobile ? 20 : 60),
@@ -114,7 +112,6 @@ class GetInTouchSection extends StatelessWidget {
             Stack(
               clipBehavior: Clip.none,
               children: [
-                 
                 Container(
                   width: double.infinity,
                   padding: EdgeInsets.all(isMobile ? 20 : 60),
@@ -131,7 +128,6 @@ class GetInTouchSection extends StatelessWidget {
                   ),
                   child: Row(
                     children: [
-                       
                       Expanded(
                         flex: 3,
                         child: Column(
@@ -157,26 +153,18 @@ class GetInTouchSection extends StatelessWidget {
                             ),
                             const SizedBox(height: 40),
                             _MessageButton(),
-                            const SizedBox(
-                              height: 140,
-                            ),  
+                            const SizedBox(height: 140),
                           ],
                         ),
                       ),
                       const SizedBox(width: 40),
-                       
-                      Expanded(
-                        flex: 2,
-                        child: Container(
-                          height: 400,
-                           
-                        ),
-                      ),
+
+                      Expanded(flex: 2, child: Container(height: 400)),
                     ],
                   ),
                 ),
                 Positioned(
-                  right: -10,  
+                  right: -10,
                   top: -110,
                   child: Container(
                     width: 350,
@@ -184,7 +172,7 @@ class GetInTouchSection extends StatelessWidget {
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(12),
                       child: Image.asset(
-                        'assets/images/download.png',
+                        'assets/images/imageeee.png',
                         fit: BoxFit.cover,
                         errorBuilder: (context, error, stackTrace) {
                           print('Error loading image: $error');
@@ -419,25 +407,26 @@ class _ContactDialogState extends State<ContactDialog>
   }
 
   Future<void> _sendEmail() async {
-    if (!_formKey.currentState!.validate()) return;
+    print('DEBUG: Send button tapped. Validating form...');
+    if (!_formKey.currentState!.validate()) {
+      print('DEBUG: Form validation failed.');
+      return;
+    }
 
     setState(() => _isSending = true);
+    print('DEBUG: Form valid. Attempting to send via EmailJS...');
 
     try {
-       
-      final serviceId = dotenv.env['EMAILJS_SERVICE_ID'] ?? '';
-      final templateId = dotenv.env['EMAILJS_TEMPLATE_ID'] ?? '';
-      final publicKey = dotenv.env['EMAILJS_PUBLIC_KEY'] ?? '';
-      final toEmail =
-          dotenv.env['EMAILJS_TO_EMAIL'] ?? 'your-email@example.com';
-
-      if (serviceId.isEmpty || templateId.isEmpty || publicKey.isEmpty) {
+      if (!dotenv.isInitialized) {
+        print(
+          'DEBUG: dotenv is not initialized! The .env file failed to load.',
+        );
         setState(() => _isSending = false);
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text(
-                'EmailJS credentials are not set. Please add them to your .env file.',
+                'Failed to load environment variables. Please fully restart the app.',
               ),
               backgroundColor: Colors.red,
             ),
@@ -446,6 +435,32 @@ class _ContactDialogState extends State<ContactDialog>
         return;
       }
 
+      final serviceId = dotenv.env['EMAILJS_SERVICE_ID'] ?? '';
+      final templateId = dotenv.env['EMAILJS_TEMPLATE_ID'] ?? '';
+      final publicKey = dotenv.env['EMAILJS_PUBLIC_KEY'] ?? '';
+      final toEmail = dotenv.env['EMAILJS_TO_EMAIL'] ?? '';
+
+      print(
+        'DEBUG: Loaded .env variables. ServiceID empty? ${serviceId.isEmpty}',
+      );
+
+      if (serviceId.isEmpty || templateId.isEmpty || publicKey.isEmpty) {
+        setState(() => _isSending = false);
+        print('DEBUG: EmailJS credentials missing in .env file.');
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text(
+                'EmailJS credentials are not set. Please check your .env file.',
+              ),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+        return;
+      }
+
+      print('DEBUG: Making HTTP POST to EmailJS API...');
       final response = await http.post(
         Uri.parse('https://api.emailjs.com/api/v1.0/email/send'),
         headers: {'Content-Type': 'application/json'},
@@ -457,12 +472,15 @@ class _ContactDialogState extends State<ContactDialog>
             'from_name': _nameController.text,
             'from_email': _emailController.text,
             'message': _messageController.text,
-            'to_email': _emailController.text, 
+            'to_email': _emailController.text,
           },
         }),
       );
 
+      print('DEBUG: EmailJS response status code: ${response.statusCode}');
+
       if (response.statusCode == 200) {
+        print('DEBUG: Email sent successfully!');
         setState(() {
           _isSending = false;
           _emailSent = true;
@@ -471,12 +489,13 @@ class _ContactDialogState extends State<ContactDialog>
         await Future.delayed(const Duration(seconds: 2));
         if (mounted) Navigator.of(context).pop();
       } else {
-        print('EmailJS send failed: ${response.statusCode} ${response.body}');
+        print('DEBUG: EmailJS send failed: ${response.body}');
         throw Exception(
           'Failed to send email: ${response.statusCode} ${response.body}',
         );
       }
     } catch (e) {
+      print('DEBUG: Caught exception during send: $e');
       setState(() => _isSending = false);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -597,7 +616,6 @@ class _ContactDialogState extends State<ContactDialog>
           ),
           const SizedBox(height: 32),
 
-           
           _buildTextField(
             controller: _nameController,
             label: 'Your Name',
@@ -611,7 +629,6 @@ class _ContactDialogState extends State<ContactDialog>
           ),
           const SizedBox(height: 20),
 
-           
           _buildTextField(
             controller: _emailController,
             label: 'Your Email',
@@ -629,7 +646,6 @@ class _ContactDialogState extends State<ContactDialog>
           ),
           const SizedBox(height: 20),
 
-           
           _buildTextField(
             controller: _messageController,
             label: 'Your Message',
@@ -644,7 +660,6 @@ class _ContactDialogState extends State<ContactDialog>
           ),
           const SizedBox(height: 32),
 
-           
           SizedBox(
             width: double.infinity,
             child: ElevatedButton(

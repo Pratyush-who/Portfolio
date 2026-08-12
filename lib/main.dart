@@ -8,7 +8,9 @@ Future<void> main() async {
 
   try {
     await dotenv.load(fileName: '.env');
-  } catch (_) {
+  } catch (e, stacktrace) {
+    print('Failed to load .env file: $e');
+    print(stacktrace);
     // .env not bundled (e.g. production build without .env asset)
   }
 

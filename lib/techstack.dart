@@ -12,10 +12,10 @@ final Map<String, List<String>> techStack = {
     'CSS3',
     'JavaScript',
   ],
-  'BACKEND': ['Spring Boot', 'Node.js', 'REST APIs', 'JWT'],
-  'DATABASES': ['Firebase', 'PostgreSQL', 'MongoDB', 'Supabase', 'Hive'],
-  'TOOLS': ['Git', 'GitHub', 'Postman', 'VS Code', 'Android Studio'],
-  'LANGUAGES': ['Java', 'Dart', 'JavaScript', 'Python', 'SQL'],
+  'BACKEND': ['Spring Boot', 'Node.js', 'Golang', 'REST APIs', 'JWT'],
+  'DATABASES': ['Firebase', 'PostgreSQL', 'MySQL', 'MongoDB', 'Supabase', 'Redis', 'Hive'],
+  'TOOLS': ['Git', 'GitHub', 'Postman', 'Prometheus', 'Grafana', 'VS Code', 'Android Studio'],
+  'LANGUAGES': ['Java', 'Golang', 'Dart', 'JavaScript', 'Python', 'SQL'],
 };
 
 class TechstackSection extends StatelessWidget {

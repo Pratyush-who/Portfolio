@@ -6,7 +6,9 @@ import 'package:flutter/services.dart';
 import 'package:portfolioflutter/preload_service.dart';
 
 class AboutSection extends StatefulWidget {
-  const AboutSection({super.key});
+  final VoidCallback? onContactTap;
+
+  const AboutSection({super.key, this.onContactTap});
   @override
   State<AboutSection> createState() => _AboutSectionState();
 }
@@ -281,7 +283,7 @@ class _AboutSectionState extends State<AboutSection>
                   opacity: _descriptionController.isCompleted ? 1.0 : 0.0,
                   duration: const Duration(milliseconds: 500),
                   child: Text(
-                    'Hi, I am Pratyush Mehra, a Flutter App Developer building cross-platform mobile applications. Specializing in state management, UI/UX design, and scalable app architecture. Building random stuff that somehow makes sense.',
+                    'Hi, I’m Pratyush Mehra, a Flutter Developer with 2+ years of hands-on experience building and deploying softwares. I work with REST APIs, state management, clean architecture, and responsive UI/UX, and also have hands-on experience with Spring Boot, Go, system design, and scalable backend systems. I basically build stuff that somehow makes sense.',
                     style: GoogleFonts.jetBrainsMono(
                       color: Colors.grey[300],
                       fontSize: isDesktop ? 16 : 14,
@@ -355,7 +357,9 @@ class _AboutSectionState extends State<AboutSection>
       onExit: (_) => setState(() => _isHovering = false),
       child: GestureDetector(
         onTap: () {
-          // Add your contact action here
+          if (widget.onContactTap != null) {
+            widget.onContactTap!();
+          }
         },
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 200),
@@ -364,6 +368,15 @@ class _AboutSectionState extends State<AboutSection>
             color: _isHovering ? const Color(0xFFFF6B35) : Colors.transparent,
             border: Border.all(color: const Color(0xFFFF6B35), width: 1.5),
             borderRadius: BorderRadius.circular(4),
+            boxShadow: _isHovering
+                ? [
+                    BoxShadow(
+                      color: const Color(0xFFFF6B35).withOpacity(0.5),
+                      blurRadius: 10,
+                      spreadRadius: 2,
+                    )
+                  ]
+                : [],
           ),
           child: Text(
             'Open to work',
