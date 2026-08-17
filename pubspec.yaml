@@ -17,6 +17,7 @@ dependencies:
   http: ^1.1.0
   flutter_dotenv: ^6.0.0
   url_launcher: ^6.3.2
+  flutter_svg: ^2.2.3
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -30,3 +31,15 @@ flutter:
   assets:
   - assets/images/
   - .env
+  - assets/characters/Gorgon_1/
+  - assets/characters/Gorgon_2/
+  - assets/characters/Gorgon_3/
+  - assets/characters/Karasu_tengu/
+  - assets/characters/Kitsune/
+  - assets/characters/Kunoichi/
+  - assets/characters/Onre/
+  - assets/characters/Satyr_1/
+  - assets/characters/Satyr_2/
+  - assets/characters/Satyr_3/
+  - assets/characters/Yamabushi_tengu/
+  - assets/characters/Yurei/

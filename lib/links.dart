@@ -1,14 +1,52 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:portfolioflutter/widgets/pixel_character_footer/pixel_character_footer.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+class _SectionLabel extends StatelessWidget {
+  final String label;
+  const _SectionLabel({required this.label});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          '// ',
+          style: GoogleFonts.jetBrainsMono(
+            color: const Color(0xFFFF6B35),
+            fontSize: 13,
+            fontWeight: FontWeight.w600,
+            letterSpacing: 1,
+          ),
+        ),
+        Text(
+          label,
+          style: GoogleFonts.jetBrainsMono(
+            color: const Color(0xFFFF6B35),
+            fontSize: 13,
+            fontWeight: FontWeight.w600,
+            letterSpacing: 1.8,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
 class LinksSection extends StatelessWidget {
-  const LinksSection({super.key});
+  final ValueListenable<bool>? animationsEnabled;
+
+  const LinksSection({super.key, this.animationsEnabled});
 
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final isDesktop = screenWidth > 800;
+    final isMobile = screenWidth < 640;
+    final horizontalPadding = isMobile ? 20.0 : screenWidth * 0.12;
 
     return Container(
       width: double.infinity,
@@ -16,21 +54,26 @@ class LinksSection extends StatelessWidget {
       child: Column(
         children: [
           Padding(
-            padding: EdgeInsets.symmetric(
-              horizontal: screenWidth * 0.12,
-              vertical: 30,
+            padding: EdgeInsets.fromLTRB(
+              horizontalPadding,
+              30,
+              horizontalPadding,
+              isMobile ? 28 : 40,
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
+                _SectionLabel(label: 'LINKS'),
+                SizedBox(height: isMobile ? 6 : 8),
                 Text(
-                  'LINKS',
+                  'FIND ME HERE',
                   style: GoogleFonts.jetBrainsMono(
                     color: Colors.white,
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 2,
+                    fontSize: isMobile ? 22 : 30,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 1.2,
+                    height: 1.15,
                   ),
                 ),
                 const SizedBox(height: 30),
@@ -58,12 +101,20 @@ class LinksSection extends StatelessWidget {
                           _buildProfileImage(height: _calculateImageHeight()),
                         ],
                       ),
-                const SizedBox(height: 60),
-                _buildFooter(),
               ],
             ),
           ),
-          const _FooterGlowWave(), // Moved outside padding for edge-to-edge width
+          const _FooterBanner(),
+          if (animationsEnabled == null)
+            const PixelCharacterFooter()
+          else
+            ValueListenableBuilder<bool>(
+              valueListenable: animationsEnabled!,
+              builder: (context, active, child) {
+                return TickerMode(enabled: active, child: child!);
+              },
+              child: const PixelCharacterFooter(),
+            ),
         ],
       ),
     );
@@ -186,132 +237,49 @@ class LinksSection extends StatelessWidget {
     );
   }
 
-  Widget _buildFooter() {
-    return Column(
-      children: [
-        SizedBox(
-          width: double.infinity,
-          child: FittedBox(
-            fit: BoxFit.fitWidth,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20.0),
-              child: Stack(
-                children: [
-                  // Outline
-                  Text(
-                    'PRATYUSH-WHO',
-                    style: GoogleFonts.pixelifySans(
-                      fontSize: 240,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: 10,
-                      foreground: Paint()
-                        ..style = PaintingStyle.stroke
-                        ..strokeWidth = 4
-                        ..color = const Color(
-                          0xFFFF6B35,
-                        ).withOpacity(0.3), // Orange outline
-                    ),
-                  ),
-                  // Solid Fill
-                  Text(
-                    'PRATYUSH-WHO',
-                    style: GoogleFonts.pixelifySans(
-                      fontSize: 240,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: 10,
-                      color: Colors.white.withOpacity(0.02), // Very faint fill
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
 }
 
-class _FooterGlowWave extends StatelessWidget {
-  const _FooterGlowWave();
+class _FooterBanner extends StatelessWidget {
+  const _FooterBanner();
 
   @override
   Widget build(BuildContext context) {
-    final heights = [0.3, 0.55, 0.8, 1.0, 0.8, 0.55, 0.3];
-    return SizedBox(
-      height: 290,
-      width: double.infinity,
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: List.generate(7, (index) {
-          final isLast = index == 6;
-          return Expanded(
-            child: Stack(
-              children: [
-                // Gradient Fill
-                Align(
-                  alignment: Alignment.bottomCenter,
-                  child: FractionallySizedBox(
-                    heightFactor: heights[index],
-                    widthFactor: 1.0,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                          colors: [
-                            Colors.transparent,
-                            const Color(0xFFFF6B35).withOpacity(0.6),
-                            const Color(0xFFFF6B35).withOpacity(0.9),
-                            const Color(0xFFFF6B35).withOpacity(0.9),
-                          ],
-                          stops: const [0.0, 0.4, 0.75, 1.0],
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-                // Dotted Line on the right
-                if (!isLast)
-                  Positioned(
-                    right: 0,
-                    top: 0,
-                    bottom: 0,
-                    child: CustomPaint(
-                      size: const Size(1, double.infinity),
-                      painter: _DottedLinePainter(),
-                    ),
-                  ),
+    final w = MediaQuery.of(context).size.width;
+    final isMobile = w < 640;
+    final height = (w * (isMobile ? 0.38 : 0.2)).clamp(140.0, 300.0);
+
+    return ClipRect(
+      child: SizedBox(
+        width: double.infinity,
+        height: height,
+        child: ShaderMask(
+          blendMode: BlendMode.dstIn,
+          shaderCallback: (rect) {
+            return const LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                Colors.transparent,
+                Colors.white,
+                Colors.white,
               ],
-            ),
-          );
-        }),
+              stops: [0.0, 0.18, 1.0],
+            ).createShader(rect);
+          },
+          child: Image.asset(
+            'assets/images/footer.png',
+            width: double.infinity,
+            height: height,
+            fit: BoxFit.cover,
+            alignment: Alignment.center,
+            filterQuality: FilterQuality.medium,
+            cacheWidth: 1600,
+            semanticLabel: 'PRATYUSH-WHO',
+          ),
+        ),
       ),
     );
   }
-}
-
-class _DottedLinePainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    var paint = Paint()
-      ..color = Colors.white.withOpacity(0.15)
-      ..strokeWidth = 1
-      ..strokeCap = StrokeCap.round;
-
-    var max = size.height;
-    var dashWidth = 2.0;
-    var dashSpace = 4.0;
-    double startY = 0;
-
-    while (startY < max) {
-      canvas.drawLine(Offset(0, startY), Offset(0, startY + dashWidth), paint);
-      startY += dashWidth + dashSpace;
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
 class _LinkItem extends StatefulWidget {

@@ -4,6 +4,38 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
+class _SectionLabel extends StatelessWidget {
+  final String label;
+  const _SectionLabel({required this.label});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          '// ',
+          style: GoogleFonts.jetBrainsMono(
+            color: const Color(0xFFFF6B35),
+            fontSize: 13,
+            fontWeight: FontWeight.w600,
+            letterSpacing: 1,
+          ),
+        ),
+        Text(
+          label,
+          style: GoogleFonts.jetBrainsMono(
+            color: const Color(0xFFFF6B35),
+            fontSize: 13,
+            fontWeight: FontWeight.w600,
+            letterSpacing: 1.8,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
 class GetInTouchSection extends StatelessWidget {
   const GetInTouchSection({super.key});
 
@@ -22,45 +54,59 @@ class GetInTouchSection extends StatelessWidget {
       child: Column(
         children: [
           if (isMobile) ...[
-            Container(
-              width: double.infinity,
-              padding: EdgeInsets.all(isMobile ? 20 : 60),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(20),
-                color: const Color(0xFF1A1A1A),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.8),
-                    blurRadius: 40,
-                    offset: const Offset(0, 20),
+            Stack(
+              clipBehavior: Clip.none,
+              children: [
+                Container(
+                  width: double.infinity,
+                  padding: EdgeInsets.fromLTRB(
+                    20,
+                    20,
+                    20 + (screenWidth * 0.22).clamp(70.0, 110.0),
+                    20,
                   ),
-                ],
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Get in Touch',
-                    style: GoogleFonts.inter(
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                      height: 1.2,
-                    ),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(20),
+                    color: const Color(0xFF1A1A1A),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.8),
+                        blurRadius: 40,
+                        offset: const Offset(0, 20),
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 16),
-                  Text(
-                    "I'm always open to discussing new projects, creative ideas, or opportunities to be part of your vision. Feel free to reach out!",
-                    style: GoogleFonts.inter(
-                      fontSize: 14,
-                      color: const Color(0xFFB3B3B3),
-                      height: 1.6,
-                    ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _SectionLabel(label: 'CONTACT'),
+                      const SizedBox(height: 8),
+                      Text(
+                        'GET IN TOUCH',
+                        style: GoogleFonts.jetBrainsMono(
+                          fontSize: 26,
+                          fontWeight: FontWeight.w800,
+                          color: Colors.white,
+                          letterSpacing: 1.2,
+                          height: 1.15,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        "I'm always open to discussing new projects, creative ideas, or opportunities to be part of your vision. Feel free to reach out!",
+                        style: GoogleFonts.inter(
+                          fontSize: 14,
+                          color: const Color(0xFFB3B3B3),
+                          height: 1.6,
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      _MessageButton(),
+                    ],
                   ),
-                  const SizedBox(height: 20),
-                  _MessageButton(),
-                ],
-              ),
+                ),
+                const _ContactPortrait(),
+              ],
             ),
             const SizedBox(height: 20),
             Container(
@@ -133,13 +179,16 @@ class GetInTouchSection extends StatelessWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
+                            _SectionLabel(label: 'CONTACT'),
+                            const SizedBox(height: 10),
                             Text(
-                              'Get in Touch',
-                              style: GoogleFonts.inter(
-                                fontSize: 48,
-                                fontWeight: FontWeight.bold,
+                              'GET IN TOUCH',
+                              style: GoogleFonts.jetBrainsMono(
+                                fontSize: 42,
+                                fontWeight: FontWeight.w800,
                                 color: Colors.white,
-                                height: 1.2,
+                                letterSpacing: 1.2,
+                                height: 1.15,
                               ),
                             ),
                             const SizedBox(height: 30),
@@ -163,37 +212,7 @@ class GetInTouchSection extends StatelessWidget {
                     ],
                   ),
                 ),
-                Positioned(
-                  right: -10,
-                  top: -110,
-                  child: Container(
-                    width: 350,
-                    height: 450,
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(12),
-                      child: Image.asset(
-                        'assets/images/imageeee.png',
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) {
-                          print('Error loading image: $error');
-                          return Container(
-                            decoration: const BoxDecoration(
-                              gradient: LinearGradient(
-                                begin: Alignment.topLeft,
-                                end: Alignment.bottomRight,
-                                colors: [
-                                  Color(0xFF4A4A4A),
-                                  Color(0xFF2A2A2A),
-                                  Color(0xFF1A1A1A),
-                                ],
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                  ),
-                ),
+                const _ContactPortrait(),
                 Positioned(
                   left: 60,
                   right: 60,
@@ -251,6 +270,44 @@ class GetInTouchSection extends StatelessWidget {
             ),
           ],
         ],
+      ),
+    );
+  }
+}
+
+class _ContactPortrait extends StatelessWidget {
+  const _ContactPortrait();
+
+  @override
+  Widget build(BuildContext context) {
+    final w = MediaQuery.sizeOf(context).width;
+    final isMobile = w < 800;
+    final imgW = isMobile
+        ? (w * 0.34).clamp(120.0, 168.0)
+        : (w * 0.20).clamp(228.0, 298.0);
+    final imgH = imgW * 1.22;
+    final right = isMobile ? w * 0.045 : (w * 0.022).clamp(16.0, 36.0);
+    final top = isMobile ? 22.0 : -(imgH * 0.12);
+
+    return Positioned(
+      right: right,
+      top: top,
+      child: SizedBox(
+        width: imgW,
+        height: imgH,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(12),
+          child: Image.asset(
+            'assets/images/imageeee.png',
+            fit: BoxFit.cover,
+            cacheWidth: 600,
+            filterQuality: FilterQuality.medium,
+            gaplessPlayback: true,
+            errorBuilder: (context, error, stackTrace) {
+              return const ColoredBox(color: Color(0xFF2A2A2A));
+            },
+          ),
+        ),
       ),
     );
   }

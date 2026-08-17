@@ -14,4 +14,4 @@ EMAILJS_PUBLIC_KEY=$EMAILJS_PUBLIC_KEY
 EOF
 
 flutter pub get
-flutter build web --release
+flutter build web --release --no-source-maps --tree-shake-icons

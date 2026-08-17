@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'dart:async';
 import 'package:portfolioflutter/homepage.dart';
 import 'package:portfolioflutter/preload_service.dart';
 import 'package:rive/rive.dart' hide LinearGradient;
@@ -24,8 +23,8 @@ class _SplashScreenState extends State<SplashScreen>
   StateMachineController? _splashController;
   bool _splashRiveLoaded = false;
   bool _isHoveringRive = false;
+  bool _assetsReady = false;
 
-  // Known hover input names to try
   static const _hoverInputNames = [
     'Hover',
     'hover',
@@ -43,22 +42,20 @@ class _SplashScreenState extends State<SplashScreen>
     super.initState();
     _initializeAnimations();
     _loadSplashRive();
-    _preloadHomePage();
     _startSplashSequence();
   }
 
   void _initializeAnimations() {
     _fadeController = AnimationController(
-      duration: const Duration(milliseconds: 1000),
+      duration: const Duration(milliseconds: 700),
       vsync: this,
     );
-    _fadeAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(parent: _fadeController, curve: Curves.easeIn));
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _fadeController, curve: Curves.easeIn),
+    );
 
     _exitController = AnimationController(
-      duration: const Duration(milliseconds: 800),
+      duration: const Duration(milliseconds: 500),
       vsync: this,
     );
     _exitAnimation = Tween<double>(begin: 1.0, end: 0.0).animate(
@@ -79,10 +76,6 @@ class _SplashScreenState extends State<SplashScreen>
         if (c != null) {
           artboard.addController(c);
           controller = c;
-          // Print all inputs for debugging
-          for (final input in c.inputs) {
-            print('🎮 Rive input: "${input.name}" (${input.runtimeType})');
-          }
           break;
         }
       }
@@ -90,16 +83,15 @@ class _SplashScreenState extends State<SplashScreen>
         artboard.addController(SimpleAnimation(artboard.animations.first.name));
       }
 
+      if (!mounted) return;
       setState(() {
         _splashArtboard = artboard;
         _splashController = controller;
         _splashRiveLoaded = true;
       });
-    } catch (e) {
-      print('Error loading splash Rive: $e');
-      setState(() {
-        _splashRiveLoaded = false;
-      });
+    } catch (_) {
+      if (!mounted) return;
+      setState(() => _splashRiveLoaded = false);
     }
   }
 
@@ -108,7 +100,6 @@ class _SplashScreenState extends State<SplashScreen>
     _isHoveringRive = hovering;
 
     for (final input in _splashController!.inputs) {
-      // Try boolean inputs matching known hover names
       if (input is SMIBool &&
           _hoverInputNames.any(
             (name) => name.toLowerCase() == input.name.toLowerCase(),
@@ -118,7 +109,6 @@ class _SplashScreenState extends State<SplashScreen>
       }
     }
 
-    // Fallback: fire trigger with hover-like name
     for (final input in _splashController!.inputs) {
       if (input is SMITrigger &&
           _hoverInputNames.any(
@@ -129,7 +119,6 @@ class _SplashScreenState extends State<SplashScreen>
       }
     }
 
-    // Last fallback: toggle all boolean inputs
     for (final input in _splashController!.inputs) {
       if (input is SMIBool) {
         input.value = hovering;
@@ -137,36 +126,39 @@ class _SplashScreenState extends State<SplashScreen>
     }
   }
 
-  void _preloadHomePage() async {
-    try {
-      await Future.delayed(const Duration(milliseconds: 500));
-      await PreloadService.preloadAssets();
-      print('✅ Homepage and assets preloaded successfully');
-    } catch (e) {
-      print('❌ Error preloading homepage: $e');
-    }
-  }
-
-  void _startSplashSequence() async {
+  Future<void> _startSplashSequence() async {
     _fadeController.forward();
-    await Future.delayed(const Duration(seconds: 5));
-    _navigateToHomePage();
+
+    // Keep splash on screen long enough to see, but don't leave until
+    // homepage assets (Rive, fonts, sprites) are actually ready.
+    await Future.wait([
+      PreloadService.preloadAssets().timeout(
+        const Duration(seconds: 8),
+        onTimeout: () {},
+      ),
+      Future<void>.delayed(const Duration(seconds: 5)),
+    ]);
+
+    if (!mounted) return;
+    setState(() => _assetsReady = true);
+    await Future<void>.delayed(const Duration(milliseconds: 250));
+    if (!mounted) return;
+    await _navigateToHomePage();
   }
 
-  void _navigateToHomePage() async {
+  Future<void> _navigateToHomePage() async {
     await _exitController.forward();
-    if (mounted) {
-      Navigator.of(context).pushReplacement(
-        PageRouteBuilder(
-          pageBuilder: (context, animation, secondaryAnimation) =>
-              const HomePage(),
-          transitionDuration: const Duration(milliseconds: 500),
-          transitionsBuilder: (context, animation, secondaryAnimation, child) {
-            return FadeTransition(opacity: animation, child: child);
-          },
-        ),
-      );
-    }
+    if (!mounted) return;
+    Navigator.of(context).pushReplacement(
+      PageRouteBuilder(
+        pageBuilder: (context, animation, secondaryAnimation) =>
+            const HomePage(),
+        transitionDuration: const Duration(milliseconds: 400),
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          return FadeTransition(opacity: animation, child: child);
+        },
+      ),
+    );
   }
 
   @override
@@ -179,93 +171,56 @@ class _SplashScreenState extends State<SplashScreen>
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.sizeOf(context);
     return Scaffold(
       backgroundColor: Colors.black,
-      body: AnimatedBuilder(
-        animation: _exitAnimation,
-        builder: (context, child) {
-          return Opacity(
-            opacity: _exitAnimation.value,
-            child: Container(
-              width: double.infinity,
-              height: double.infinity,
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [Colors.black, Color(0xFF1a1a1a), Colors.black],
+      body: FadeTransition(
+        opacity: _exitAnimation,
+        child: Container(
+          width: double.infinity,
+          height: double.infinity,
+          color: Colors.black,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              FadeTransition(
+                opacity: _fadeAnimation,
+                child: SizedBox(
+                  width: (size.width * 0.8).clamp(350.0, 600.0),
+                  height: (size.width * 0.8).clamp(350.0, 600.0),
+                  child: _splashRiveLoaded && _splashArtboard != null
+                      ? MouseRegion(
+                          cursor: SystemMouseCursors.click,
+                          onEnter: (_) => _onRiveHover(true),
+                          onExit: (_) => _onRiveHover(false),
+                          child: Rive(
+                            artboard: _splashArtboard!,
+                            fit: BoxFit.contain,
+                            antialiasing: false,
+                          ),
+                        )
+                      : const SizedBox.shrink(),
                 ),
               ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  AnimatedBuilder(
-                    animation: _fadeAnimation,
-                    builder: (context, child) {
-                      return Opacity(
-                        opacity: _fadeAnimation.value,
-                        child: Container(
-                          width: MediaQuery.of(context).size.width * 0.8,
-                          height: MediaQuery.of(context).size.width * 0.8,
-                          constraints: const BoxConstraints(
-                            maxWidth: 600,
-                            maxHeight: 600,
-                            minWidth: 350,
-                            minHeight: 350,
-                          ),
-                          child: _splashRiveLoaded && _splashArtboard != null
-                              ? MouseRegion(
-                                  cursor: SystemMouseCursors.click,
-                                  onEnter: (_) => _onRiveHover(true),
-                                  onExit: (_) => _onRiveHover(false),
-                                  child: Rive(
-                                    artboard: _splashArtboard!,
-                                    fit: BoxFit.contain,
-                                  ),
-                                )
-                              : Container(
-                                  decoration: BoxDecoration(
-                                    color: Colors.grey[900],
-                                    borderRadius: BorderRadius.circular(20),
-                                    border: Border.all(
-                                      color: Colors.grey[700]!,
-                                      width: 2,
-                                    ),
-                                  ),
-                                  child: Icon(
-                                    Icons.animation_outlined,
-                                    color: Colors.grey[600],
-                                    size: 80,
-                                  ),
-                                ),
-                        ),
-                      );
-                    },
+              const SizedBox(height: 40),
+              FadeTransition(
+                opacity: _fadeAnimation,
+                child: Text(
+                  _assetsReady
+                      ? "Entering Pratyush-who's Developer World..."
+                      : 'Loading assets...',
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.jetBrainsMono(
+                    color: Colors.white,
+                    fontSize: 20,
+                    fontWeight: FontWeight.w600,
+                    height: 1.2,
                   ),
-                  const SizedBox(height: 40),
-                  AnimatedBuilder(
-                    animation: _fadeAnimation,
-                    builder: (context, child) {
-                      return Opacity(
-                        opacity: _fadeAnimation.value,
-                        child: Text(
-                          "Entering Pratyush-who's Developer World...",
-                          textAlign: TextAlign.center,
-                          style: GoogleFonts.jetBrainsMono(
-                            color: Colors.white,
-                            fontSize: 24,
-                            fontWeight: FontWeight.w600,
-                            height: 1.2,
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                ],
+                ),
               ),
-            ),
-          );
-        },
+            ],
+          ),
+        ),
       ),
     );
   }

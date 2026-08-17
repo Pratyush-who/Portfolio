@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-// Single source-of-truth for tech categories
 final Map<String, List<String>> techStack = {
   'FRONTEND': [
     'Flutter',
@@ -17,6 +16,38 @@ final Map<String, List<String>> techStack = {
   'TOOLS': ['Git', 'GitHub', 'Postman', 'Prometheus', 'Grafana', 'VS Code', 'Android Studio'],
   'LANGUAGES': ['Java', 'Golang', 'Dart', 'JavaScript', 'Python', 'SQL'],
 };
+
+class _SectionLabel extends StatelessWidget {
+  final String label;
+  const _SectionLabel({required this.label});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          '// ',
+          style: GoogleFonts.jetBrainsMono(
+            color: const Color(0xFFFF6B35),
+            fontSize: 13,
+            fontWeight: FontWeight.w600,
+            letterSpacing: 1,
+          ),
+        ),
+        Text(
+          label,
+          style: GoogleFonts.jetBrainsMono(
+            color: const Color(0xFFFF6B35),
+            fontSize: 13,
+            fontWeight: FontWeight.w600,
+            letterSpacing: 1.8,
+          ),
+        ),
+      ],
+    );
+  }
+}
 
 class TechstackSection extends StatelessWidget {
   const TechstackSection({super.key});
@@ -42,13 +73,16 @@ class TechstackSection extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
+          _SectionLabel(label: 'TECHSTACK'),
+          SizedBox(height: isMobile ? 6 : 8),
           Text(
-            'TECHSTACK',
+            'SKILLS & TOOLS',
             style: GoogleFonts.jetBrainsMono(
               color: Colors.white,
-              fontSize: isMobile ? 24 : 28,
-              fontWeight: FontWeight.bold,
-              letterSpacing: 2,
+              fontSize: isMobile ? 22 : 30,
+              fontWeight: FontWeight.w800,
+              letterSpacing: 1.2,
+              height: 1.15,
             ),
           ),
           const SizedBox(height: 36),

@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:portfolioflutter/about.dart';
+import 'package:portfolioflutter/experience.dart';
+import 'package:portfolioflutter/getintouch.dart';
 import 'package:portfolioflutter/links.dart';
+import 'package:portfolioflutter/preload_service.dart';
 import 'package:portfolioflutter/project.dart';
 import 'package:portfolioflutter/techstack.dart';
-import 'package:portfolioflutter/getintouch.dart';
-import 'package:portfolioflutter/experience.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -17,13 +17,12 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final ScrollController _scrollController = ScrollController();
-  int _currentPage = 0;
-  final List<GlobalKey> _sectionKeys = List.generate(
-    6,
-    (index) => GlobalKey(),
-  ); 
-  
-  final List<String> _sections = [
+  final ValueNotifier<int> _currentPage = ValueNotifier<int>(0);
+  final ValueNotifier<bool> _aboutActive = ValueNotifier<bool>(true);
+  final ValueNotifier<bool> _footerActive = ValueNotifier<bool>(false);
+  final List<GlobalKey> _sectionKeys = List.generate(6, (index) => GlobalKey());
+
+  static const _sections = [
     'ABOUT',
     'TECHSTACK',
     'EXPERIENCE',
@@ -36,41 +35,66 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     _scrollController.addListener(_onScroll);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _onScroll();
+      _revealRest();
+    });
+  }
+
+  int _builtCount = 1;
+
+  Future<void> _revealRest() async {
+    await WidgetsBinding.instance.endOfFrame;
+    PreloadService.warmupIdle();
+    while (_builtCount < 6 && mounted) {
+      await Future<void>.delayed(const Duration(milliseconds: 70));
+      if (!mounted) return;
+      setState(() => _builtCount++);
+    }
   }
 
   void _onScroll() {
-    final scrollOffset = _scrollController.offset;
-    final screenHeight = MediaQuery.of(context).size.height;
+    if (!_scrollController.hasClients) return;
+    final pos = _scrollController.position;
+    final h = pos.viewportDimension;
+    final offset = pos.pixels;
 
-    int newCurrentPage = 0;
-    if (scrollOffset > screenHeight * 0.2) newCurrentPage = 1; // Techstack
-    if (scrollOffset > screenHeight * 1.2) newCurrentPage = 2; // Experience
-    if (scrollOffset > screenHeight * 2.2) newCurrentPage = 3; // Projects
-    if (scrollOffset > screenHeight * 3.2) newCurrentPage = 4; // Contact
-    if (scrollOffset > screenHeight * 4.0) newCurrentPage = 5; // Links
+    var page = 0;
+    if (offset > h * 0.2) page = 1;
+    if (offset > h * 1.2) page = 2;
+    if (offset > h * 2.2) page = 3;
+    if (offset > h * 3.2) page = 4;
+    if (offset > h * 4.0) page = 5;
+    if (_currentPage.value != page) _currentPage.value = page;
 
-    if (newCurrentPage != _currentPage) {
-      setState(() {
-        _currentPage = newCurrentPage;
-      });
-    }
+    final aboutOn = offset < h * 1.25;
+    if (_aboutActive.value != aboutOn) _aboutActive.value = aboutOn;
+
+    final max = pos.maxScrollExtent;
+    final footerOn = max <= 0 ? false : offset > max - h * 1.85;
+    if (_footerActive.value != footerOn) _footerActive.value = footerOn;
   }
 
-  void _navigateToSection(int index) {
-    final key = _sectionKeys[index];
-    final ctx = key.currentContext;
-    if (ctx != null) {
-      Scrollable.ensureVisible(
-        ctx,
-        duration: const Duration(milliseconds: 600),
-        curve: Curves.easeInOut,
-        alignment: 0,
-      );
+  Future<void> _navigateToSection(int index) async {
+    if (_builtCount <= index) {
+      setState(() => _builtCount = index + 1);
+      await WidgetsBinding.instance.endOfFrame;
+      await Future<void>.delayed(const Duration(milliseconds: 20));
     }
+    final ctx = _sectionKeys[index].currentContext;
+    if (ctx == null) return;
+    await Scrollable.ensureVisible(
+      ctx,
+      duration: const Duration(milliseconds: 500),
+      curve: Curves.easeOutCubic,
+      alignment: 0,
+    );
+    _onScroll();
   }
 
   @override
   Widget build(BuildContext context) {
+    final w = MediaQuery.sizeOf(context).width;
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: PreferredSize(
@@ -78,12 +102,7 @@ class _HomePageState extends State<HomePage> {
         child: Container(
           color: Colors.black,
           child: Padding(
-            padding: EdgeInsets.symmetric(
-              horizontal: MediaQuery.of(context).size.width > 950 
-                  ? MediaQuery.of(context).size.width * 0.12 
-                  : 20,
-              vertical: 20,
-            ),
+            padding: EdgeInsets.symmetric(horizontal: w * 0.12, vertical: 20),
             child: Row(
               children: [
                 Row(
@@ -93,11 +112,12 @@ class _HomePageState extends State<HomePage> {
                       height: 32,
                       child: ClipOval(
                         child: Image.network(
-                          'https://avatars.githubusercontent.com/u/177855155?v=4&s=256',
+                          PreloadService.avatarUrl,
                           width: 32,
                           height: 32,
                           fit: BoxFit.cover,
-                          filterQuality: FilterQuality.high,
+                          filterQuality: FilterQuality.medium,
+                          gaplessPlayback: true,
                           errorBuilder: (context, error, stackTrace) =>
                               Container(
                                 color: const Color(0xFF222222),
@@ -123,22 +143,24 @@ class _HomePageState extends State<HomePage> {
                   ],
                 ),
                 const Spacer(),
-                // On small/mobile widths we remove the top navigation labels
-                // to keep the app bar clean. Use 950px as breakpoint.
-                if (MediaQuery.of(context).size.width > 950) ...[
-                  ...List.generate(_sections.length, (index) {
-                    return Padding(
-                      padding: const EdgeInsets.only(left: 6),
-                      child: _NavTag(
-                        label: _sections[index],
-                        isActive: _currentPage == index,
-                        onTap: () => _navigateToSection(index),
-                      ),
-                    );
-                  }),
-                  const SizedBox(width: 16),
-                  _ResumeButton(),
-                ],
+                if (w > 800)
+                  ValueListenableBuilder<int>(
+                    valueListenable: _currentPage,
+                    builder: (context, page, _) {
+                      return Row(
+                        children: List.generate(_sections.length, (index) {
+                          return Padding(
+                            padding: const EdgeInsets.only(left: 6),
+                            child: _NavTag(
+                              label: _sections[index],
+                              isActive: page == index,
+                              onTap: () => _navigateToSection(index),
+                            ),
+                          );
+                        }),
+                      );
+                    },
+                  ),
               ],
             ),
           ),
@@ -146,30 +168,47 @@ class _HomePageState extends State<HomePage> {
       ),
       body: SingleChildScrollView(
         controller: _scrollController,
+        physics: const ClampingScrollPhysics(),
         child: Column(
           children: [
-            Container(
-              key: _sectionKeys[0],
-              child: AboutSection(onContactTap: () => _navigateToSection(4)),
-            ),
-            const Divider(color: Color(0xFF333333), thickness: 1, height: 1),
-            Container(key: _sectionKeys[1], child: const TechstackSection()),
-            const Divider(color: Color(0xFF333333), thickness: 1, height: 1),
-            Container(key: _sectionKeys[2], child: const ExperienceSection()),
-            const Divider(color: Color(0xFF333333), thickness: 1, height: 1),
-            Container(key: _sectionKeys[3], child: const ProjectsSection()),
-            const Divider(color: Color(0xFF333333), thickness: 1, height: 1),
-            Container(
-              key: _sectionKeys[4],
-              child: const GetInTouchSection(),
-            ), // Added GetInTouch section
-            const Divider(color: Color(0xFF333333), thickness: 1, height: 1),
-            Container(
-              key: _sectionKeys[5],
-              child: const LinksSection(),
-            ), // Moved Links to last
+            for (var i = 0; i < _builtCount; i++) ...[
+              if (i > 0)
+                const Divider(color: Color(0xFF333333), thickness: 1, height: 1),
+              _buildSection(i),
+            ],
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildSection(int index) {
+    late final Widget child;
+    switch (index) {
+      case 0:
+        child = ValueListenableBuilder<bool>(
+          valueListenable: _aboutActive,
+          builder: (context, active, nested) {
+            return TickerMode(enabled: active, child: nested!);
+          },
+          child: const AboutSection(),
+        );
+      case 1:
+        child = const TechstackSection();
+      case 2:
+        child = const ExperienceSection();
+      case 3:
+        child = const ProjectsSection();
+      case 4:
+        child = const GetInTouchSection();
+      default:
+        child = LinksSection(animationsEnabled: _footerActive);
+    }
+
+    return RepaintBoundary(
+      child: KeyedSubtree(
+        key: _sectionKeys[index],
+        child: child,
       ),
     );
   }
@@ -177,6 +216,9 @@ class _HomePageState extends State<HomePage> {
   @override
   void dispose() {
     _scrollController.dispose();
+    _currentPage.dispose();
+    _aboutActive.dispose();
+    _footerActive.dispose();
     super.dispose();
   }
 }
@@ -227,47 +269,3 @@ class _NavTagState extends State<_NavTag> {
     );
   }
 }
-
-class _ResumeButton extends StatefulWidget {
-  @override
-  State<_ResumeButton> createState() => _ResumeButtonState();
-}
-
-class _ResumeButtonState extends State<_ResumeButton> {
-  bool _isHovering = false;
-
-  @override
-  Widget build(BuildContext context) {
-    return MouseRegion(
-      onEnter: (_) => setState(() => _isHovering = true),
-      onExit: (_) => setState(() => _isHovering = false),
-      child: GestureDetector(
-        onTap: () async {
-          final uri = Uri.parse('https://dub.sh/pratyush');
-          if (await canLaunchUrl(uri)) {
-            await launchUrl(uri);
-          }
-        },
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          decoration: BoxDecoration(
-            color: _isHovering ? const Color(0xFFFF6B35).withOpacity(0.1) : Colors.transparent,
-            border: Border.all(color: const Color(0xFFFF6B35), width: 1.5),
-            borderRadius: BorderRadius.circular(4),
-          ),
-          child: Text(
-            'Resume',
-            style: GoogleFonts.jetBrainsMono(
-              color: const Color(0xFFFF6B35),
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-              letterSpacing: 0.5,
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-

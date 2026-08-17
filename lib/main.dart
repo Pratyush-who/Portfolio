@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -8,17 +9,15 @@ Future<void> main() async {
 
   try {
     await dotenv.load(fileName: '.env');
-  } catch (e, stacktrace) {
-    print('Failed to load .env file: $e');
-    print(stacktrace);
-    // .env not bundled (e.g. production build without .env asset)
-  }
+  } catch (_) {}
 
-  await SystemChrome.setPreferredOrientations([
-    DeviceOrientation.portraitUp,
-    DeviceOrientation.landscapeLeft,
-    DeviceOrientation.landscapeRight,
-  ]);
+  if (!kIsWeb) {
+    await SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.landscapeLeft,
+      DeviceOrientation.landscapeRight,
+    ]);
+  }
 
   runApp(const MyApp());
 }
