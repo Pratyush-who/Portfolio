@@ -13,16 +13,18 @@ class BehaviorConfig {
   static const int attackWeight = 3;
 
   static const List<String> hiMessages = [
-    'Hi!',
-    'Hello',
-    'Hey',
-    'Yo',
+    'Hii',
+    'Ohio',
     'Namaste',
     'Konichiwa',
     'Hire me',
-    "Let's talk",
-    'Hii',
+    'Duhh',
+    'GAY',
     ':)',
+    'Hello qt',
+    'TMKC',
+    'Hihihihihi',
+    'Sojao dost'
   ];
 
   static Duration walkDuration(Random rng) =>
@@ -67,6 +69,14 @@ class BehaviorConfig {
     return CharacterState.walking;
   }
 
-  static String randomHi(Random rng) =>
-      hiMessages[rng.nextInt(hiMessages.length)];
+  static final List<String> _hiQueue = [];
+
+  static String randomHi(Random rng) {
+    if (_hiQueue.isEmpty) {
+      _hiQueue
+        ..addAll(hiMessages)
+        ..shuffle(rng);
+    }
+    return _hiQueue.removeLast();
+  }
 }

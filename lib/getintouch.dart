@@ -284,10 +284,10 @@ class _ContactPortrait extends StatelessWidget {
     final isMobile = w < 800;
     final imgW = isMobile
         ? (w * 0.34).clamp(120.0, 168.0)
-        : (w * 0.20).clamp(228.0, 298.0);
-    final imgH = imgW * 1.22;
-    final right = isMobile ? w * 0.045 : (w * 0.022).clamp(16.0, 36.0);
-    final top = isMobile ? 22.0 : -(imgH * 0.12);
+        : (w * 0.16).clamp(198.0, 258.0);
+    final imgH = imgW * 1.46;
+    final right = isMobile ? w * 0.10 : (w * 0.045).clamp(28.0, 64.0);
+    final top = isMobile ? 48.0 : (imgH * 0.01);
 
     return Positioned(
       right: right,
