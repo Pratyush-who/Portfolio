@@ -163,98 +163,101 @@ class GetInTouchSection extends StatelessWidget {
                   ),
                 ],
               ),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              child: Column(
                 children: [
-                  Expanded(
-                    flex: 3,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _SectionLabel(label: 'CONTACT'),
-                        const SizedBox(height: 10),
-                        Text(
-                          'GET IN TOUCH',
-                          style: GoogleFonts.jetBrainsMono(
-                            fontSize: 42,
-                            fontWeight: FontWeight.w800,
-                            color: Colors.white,
-                            letterSpacing: 1.2,
-                            height: 1.15,
-                          ),
-                        ),
-                        const SizedBox(height: 30),
-                        Text(
-                          "I'm always open to discussing new projects, creative\nideas, or opportunities to be part of your vision.\nFeel free to reach out!",
-                          style: GoogleFonts.inter(
-                            fontSize: 18,
-                            color: const Color(0xFFB3B3B3),
-                            height: 1.6,
-                          ),
-                        ),
-                        const SizedBox(height: 40),
-                        _MessageButton(),
-                        const SizedBox(height: 60),
-                        Container(
-                          width: double.infinity,
-                          padding: const EdgeInsets.all(20),
-                          decoration: BoxDecoration(
-                            color: Colors.black.withOpacity(0.9),
-                            borderRadius: BorderRadius.circular(8),
-                            border: Border.all(
-                              color: Colors.white.withOpacity(0.2),
-                              width: 1,
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        flex: 3,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _SectionLabel(label: 'CONTACT'),
+                            const SizedBox(height: 10),
+                            Text(
+                              'GET IN TOUCH',
+                              style: GoogleFonts.jetBrainsMono(
+                                fontSize: 42,
+                                fontWeight: FontWeight.w800,
+                                color: Colors.white,
+                                letterSpacing: 1.2,
+                                height: 1.15,
+                              ),
                             ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.5),
-                                blurRadius: 20,
-                                offset: const Offset(0, 10),
+                            const SizedBox(height: 30),
+                            Text(
+                              "I'm always open to discussing new projects, creative\nideas, or opportunities to be part of your vision.\nFeel free to reach out!",
+                              style: GoogleFonts.inter(
+                                fontSize: 18,
+                                color: const Color(0xFFB3B3B3),
+                                height: 1.6,
                               ),
-                            ],
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Text(
-                                '❝',
-                                style: TextStyle(fontSize: 32, color: Colors.white),
-                              ),
-                              Text(
-                                '"With great power comes a huge electricity bill."',
-                                style: GoogleFonts.inter(
-                                  fontSize: 19,
-                                  fontStyle: FontStyle.italic,
-                                  color: Colors.white,
-                                  height: 1.6,
-                                ),
-                              ),
-                              const SizedBox(height: 8),
-                              SizedBox(
-                                width: double.infinity,
-                                child: Text(
-                                  '—   Pratyush-Who',
-                                  style: GoogleFonts.inter(
-                                    textStyle: const TextStyle(
-                                      fontSize: 12,
-                                      color: Color(0xFF999999),
-                                    ),
-                                  ),
-                                  textAlign: TextAlign.right,
-                                ),
-                              ),
-                            ],
-                          ),
+                            ),
+                            const SizedBox(height: 40),
+                            _MessageButton(),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 40),
+                      Expanded(
+                        flex: 2,
+                        child: Align(
+                          alignment: Alignment.topRight,
+                          child: const _ContactPortraitImage(),
+                        ),
+                      ),
+                    ],
+                  ),
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      color: Colors.black.withOpacity(0.9),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(
+                        color: Colors.white.withOpacity(0.2),
+                        width: 1,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.5),
+                          blurRadius: 20,
+                          offset: const Offset(0, 10),
                         ),
                       ],
                     ),
-                  ),
-                  const SizedBox(width: 40),
-                  Expanded(
-                    flex: 2, 
-                    child: Align(
-                      alignment: Alignment.topRight,
-                      child: const _ContactPortraitImage(),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          '❝',
+                          style: TextStyle(fontSize: 32, color: Colors.white),
+                        ),
+                        Text(
+                          '"With great power comes a huge electricity bill."',
+                          style: GoogleFonts.inter(
+                            fontSize: 19,
+                            fontStyle: FontStyle.italic,
+                            color: Colors.white,
+                            height: 1.6,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        SizedBox(
+                          width: double.infinity,
+                          child: Text(
+                            '—   Pratyush-Who',
+                            style: GoogleFonts.inter(
+                              textStyle: const TextStyle(
+                                fontSize: 12,
+                                color: Color(0xFF999999),
+                              ),
+                            ),
+                            textAlign: TextAlign.right,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],
@@ -263,28 +266,6 @@ class GetInTouchSection extends StatelessWidget {
           ],
         ],
       ),
-    );
-  }
-}
-
-class _ContactPortrait extends StatelessWidget {
-  const _ContactPortrait();
-
-  @override
-  Widget build(BuildContext context) {
-    final w = MediaQuery.sizeOf(context).width;
-    final isMobile = w < 800;
-    final imgW = isMobile
-        ? (w * 0.34).clamp(120.0, 168.0)
-        : (w * 0.16).clamp(198.0, 258.0);
-    final imgH = imgW * 1.46;
-    final right = isMobile ? w * 0.10 : (w * 0.045).clamp(28.0, 64.0);
-    final top = isMobile ? 48.0 : (imgH * 0.01);
-
-    return Positioned(
-      right: right,
-      top: top,
-      child: const _ContactPortraitImage(),
     );
   }
 }
@@ -503,7 +484,6 @@ class _ContactDialogState extends State<ContactDialog>
       final serviceId = dotenv.env['EMAILJS_SERVICE_ID'] ?? '';
       final templateId = dotenv.env['EMAILJS_TEMPLATE_ID'] ?? '';
       final publicKey = dotenv.env['EMAILJS_PUBLIC_KEY'] ?? '';
-      final toEmail = dotenv.env['EMAILJS_TO_EMAIL'] ?? '';
 
       print(
         'DEBUG: Loaded .env variables. ServiceID empty? ${serviceId.isEmpty}',
