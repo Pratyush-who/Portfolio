@@ -129,19 +129,19 @@ class _SplashScreenState extends State<SplashScreen>
   Future<void> _startSplashSequence() async {
     _fadeController.forward();
 
-    // Keep splash on screen long enough to see, but don't leave until
-    // homepage assets (Rive, fonts, sprites) are actually ready.
+    // Keep splash on screen for at least 3 seconds so users can play with it,
+    // and wait until homepage assets (Rive, fonts, sprites) are ready.
     await Future.wait([
       PreloadService.preloadAssets().timeout(
         const Duration(seconds: 8),
         onTimeout: () {},
       ),
-      Future<void>.delayed(const Duration(seconds: 5)),
+      Future<void>.delayed(const Duration(seconds: 3)),
     ]);
 
     if (!mounted) return;
     setState(() => _assetsReady = true);
-    await Future<void>.delayed(const Duration(milliseconds: 250));
+    await Future<void>.delayed(const Duration(milliseconds: 100));
     if (!mounted) return;
     await _navigateToHomePage();
   }
@@ -208,7 +208,7 @@ class _SplashScreenState extends State<SplashScreen>
                 child: Text(
                   _assetsReady
                       ? "Entering Pratyush-who's Developer World..."
-                      : 'Loading assets...',
+                      : '',
                   textAlign: TextAlign.center,
                   style: GoogleFonts.jetBrainsMono(
                     color: Colors.white,

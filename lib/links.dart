@@ -104,17 +104,22 @@ class LinksSection extends StatelessWidget {
               ],
             ),
           ),
-          const _FooterBanner(),
-          if (animationsEnabled == null)
-            const PixelCharacterFooter()
-          else
-            ValueListenableBuilder<bool>(
-              valueListenable: animationsEnabled!,
-              builder: (context, active, child) {
-                return TickerMode(enabled: active, child: child!);
-              },
-              child: const PixelCharacterFooter(),
-            ),
+          Stack(
+            alignment: Alignment.bottomCenter,
+            children: [
+              const _FooterBanner(),
+              if (animationsEnabled == null)
+                const PixelCharacterFooter()
+              else
+                ValueListenableBuilder<bool>(
+                  valueListenable: animationsEnabled!,
+                  builder: (context, active, child) {
+                    return TickerMode(enabled: active, child: child!);
+                  },
+                  child: const PixelCharacterFooter(),
+                ),
+            ],
+          ),
         ],
       ),
     );

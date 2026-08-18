@@ -144,10 +144,8 @@ class _PixelCharacterFooterState extends State<PixelCharacterFooter>
   Widget build(BuildContext context) {
     return IgnorePointer(
       child: RepaintBoundary(
-        child: ColoredBox(
-          color: const Color(0xFF050505),
-          child: SizedBox(
-            height: widget.height,
+        child: SizedBox(
+          height: widget.height,
             width: double.infinity,
             child: LayoutBuilder(
               builder: (context, constraints) {
@@ -165,7 +163,6 @@ class _PixelCharacterFooterState extends State<PixelCharacterFooter>
               },
             ),
           ),
-        ),
       ),
     );
   }
@@ -193,12 +190,7 @@ class _FooterCharactersPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final groundY = size.height - 6;
-    canvas.drawLine(
-      Offset(0, groundY),
-      Offset(size.width, groundY),
-      _groundPaint,
-    );
+    final groundY = size.height;
 
     for (final character in characters) {
       if (!character.ready) continue;
@@ -231,7 +223,7 @@ class _FooterCharactersPainter extends CustomPainter {
 
     canvas.drawOval(
       Rect.fromCenter(
-        center: Offset(dest.center.dx, groundY - 1),
+        center: Offset(dest.center.dx, groundY - 2.5),
         width: destW * 0.42,
         height: 5,
       ),

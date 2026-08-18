@@ -35,7 +35,9 @@ class MyApp extends StatelessWidget {
         brightness: Brightness.dark,
         fontFamily: 'JetBrainsMono',
       ),
-      home: const SplashScreen(),
+      home: const SelectionArea(
+        child: SplashScreen(),
+      ),
     );
   }
 }

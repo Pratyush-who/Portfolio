@@ -54,17 +54,12 @@ class GetInTouchSection extends StatelessWidget {
       child: Column(
         children: [
           if (isMobile) ...[
-            Stack(
-              clipBehavior: Clip.none,
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Container(
                   width: double.infinity,
-                  padding: EdgeInsets.fromLTRB(
-                    20,
-                    20,
-                    20 + (screenWidth * 0.22).clamp(70.0, 110.0),
-                    20,
-                  ),
+                  padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(20),
                     color: const Color(0xFF1A1A1A),
@@ -105,7 +100,6 @@ class GetInTouchSection extends StatelessWidget {
                     ],
                   ),
                 ),
-                const _ContactPortrait(),
               ],
             ),
             const SizedBox(height: 20),
@@ -155,118 +149,116 @@ class GetInTouchSection extends StatelessWidget {
               ),
             ),
           ] else ...[
-            Stack(
-              clipBehavior: Clip.none,
-              children: [
-                Container(
-                  width: double.infinity,
-                  padding: EdgeInsets.all(isMobile ? 20 : 60),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(20),
-                    color: const Color(0xFF1A1A1A),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.8),
-                        blurRadius: 40,
-                        offset: const Offset(0, 20),
-                      ),
-                    ],
+            Container(
+              width: double.infinity,
+              padding: EdgeInsets.all(isMobile ? 20 : 60),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(20),
+                color: const Color(0xFF1A1A1A),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.8),
+                    blurRadius: 40,
+                    offset: const Offset(0, 20),
                   ),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        flex: 3,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            _SectionLabel(label: 'CONTACT'),
-                            const SizedBox(height: 10),
-                            Text(
-                              'GET IN TOUCH',
-                              style: GoogleFonts.jetBrainsMono(
-                                fontSize: 42,
-                                fontWeight: FontWeight.w800,
-                                color: Colors.white,
-                                letterSpacing: 1.2,
-                                height: 1.15,
-                              ),
-                            ),
-                            const SizedBox(height: 30),
-                            Text(
-                              "I'm always open to discussing new projects, creative\nideas, or opportunities to be part of your vision.\nFeel free to reach out!",
-                              style: GoogleFonts.inter(
-                                fontSize: 18,
-                                color: const Color(0xFFB3B3B3),
-                                height: 1.6,
-                              ),
-                            ),
-                            const SizedBox(height: 40),
-                            _MessageButton(),
-                            const SizedBox(height: 140),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(width: 40),
-
-                      Expanded(flex: 2, child: Container(height: 400)),
-                    ],
-                  ),
-                ),
-                const _ContactPortrait(),
-                Positioned(
-                  left: 60,
-                  right: 60,
-                  bottom: 40,
-                  child: Container(
-                    width: double.infinity,
-                    padding: EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                      color: Colors.black.withOpacity(0.9),
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(
-                        color: Colors.white.withOpacity(0.2),
-                        width: 1,
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.5),
-                          blurRadius: 20,
-                          offset: const Offset(0, 10),
-                        ),
-                      ],
-                    ),
+                ],
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    flex: 3,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        _SectionLabel(label: 'CONTACT'),
+                        const SizedBox(height: 10),
                         Text(
-                          '❝',
-                          style: TextStyle(fontSize: 32, color: Colors.white),
-                        ),
-                        Text(
-                          '"With great power comes a huge electricity bill."',
-                          style: GoogleFonts.inter(
-                            fontSize: 19,
-                            fontStyle: FontStyle.italic,
+                          'GET IN TOUCH',
+                          style: GoogleFonts.jetBrainsMono(
+                            fontSize: 42,
+                            fontWeight: FontWeight.w800,
                             color: Colors.white,
+                            letterSpacing: 1.2,
+                            height: 1.15,
+                          ),
+                        ),
+                        const SizedBox(height: 30),
+                        Text(
+                          "I'm always open to discussing new projects, creative\nideas, or opportunities to be part of your vision.\nFeel free to reach out!",
+                          style: GoogleFonts.inter(
+                            fontSize: 18,
+                            color: const Color(0xFFB3B3B3),
                             height: 1.6,
                           ),
                         ),
-                        const SizedBox(height: 8),
-                        Text(
-                          '—   Pratyush-Who',
-                          style: GoogleFonts.inter(
-                            textStyle: const TextStyle(
-                              fontSize: 12,
-                              color: Color(0xFF999999),
+                        const SizedBox(height: 40),
+                        _MessageButton(),
+                        const SizedBox(height: 60),
+                        Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.all(20),
+                          decoration: BoxDecoration(
+                            color: Colors.black.withOpacity(0.9),
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(
+                              color: Colors.white.withOpacity(0.2),
+                              width: 1,
                             ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.5),
+                                blurRadius: 20,
+                                offset: const Offset(0, 10),
+                              ),
+                            ],
                           ),
-                          textAlign: TextAlign.right,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                '❝',
+                                style: TextStyle(fontSize: 32, color: Colors.white),
+                              ),
+                              Text(
+                                '"With great power comes a huge electricity bill."',
+                                style: GoogleFonts.inter(
+                                  fontSize: 19,
+                                  fontStyle: FontStyle.italic,
+                                  color: Colors.white,
+                                  height: 1.6,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              SizedBox(
+                                width: double.infinity,
+                                child: Text(
+                                  '—   Pratyush-Who',
+                                  style: GoogleFonts.inter(
+                                    textStyle: const TextStyle(
+                                      fontSize: 12,
+                                      color: Color(0xFF999999),
+                                    ),
+                                  ),
+                                  textAlign: TextAlign.right,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ],
                     ),
                   ),
-                ),
-              ],
+                  const SizedBox(width: 40),
+                  Expanded(
+                    flex: 2, 
+                    child: Align(
+                      alignment: Alignment.topRight,
+                      child: const _ContactPortraitImage(),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ],
         ],
@@ -292,21 +284,37 @@ class _ContactPortrait extends StatelessWidget {
     return Positioned(
       right: right,
       top: top,
-      child: SizedBox(
-        width: imgW,
-        height: imgH,
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(12),
-          child: Image.asset(
-            'assets/images/imageeee.png',
-            fit: BoxFit.cover,
-            cacheWidth: 600,
-            filterQuality: FilterQuality.medium,
-            gaplessPlayback: true,
-            errorBuilder: (context, error, stackTrace) {
-              return const ColoredBox(color: Color(0xFF2A2A2A));
-            },
-          ),
+      child: const _ContactPortraitImage(),
+    );
+  }
+}
+
+class _ContactPortraitImage extends StatelessWidget {
+  const _ContactPortraitImage();
+
+  @override
+  Widget build(BuildContext context) {
+    final w = MediaQuery.sizeOf(context).width;
+    final isMobile = w < 800;
+    final imgW = isMobile
+        ? (w * 0.34).clamp(120.0, 168.0)
+        : (w * 0.16).clamp(198.0, 258.0);
+    final imgH = imgW * 1.46;
+
+    return SizedBox(
+      width: imgW,
+      height: imgH,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(12),
+        child: Image.asset(
+          'assets/images/imageeee.png',
+          fit: BoxFit.cover,
+          cacheWidth: 600,
+          filterQuality: FilterQuality.medium,
+          gaplessPlayback: true,
+          errorBuilder: (context, error, stackTrace) {
+            return const ColoredBox(color: Color(0xFF2A2A2A));
+          },
         ),
       ),
     );
