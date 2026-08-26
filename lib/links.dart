@@ -241,7 +241,6 @@ class LinksSection extends StatelessWidget {
       ),
     );
   }
-
 }
 
 class _FooterBanner extends StatelessWidget {
@@ -263,11 +262,7 @@ class _FooterBanner extends StatelessWidget {
             return const LinearGradient(
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
-              colors: [
-                Colors.transparent,
-                Colors.white,
-                Colors.white,
-              ],
+              colors: [Colors.transparent, Colors.white, Colors.white],
               stops: [0.0, 0.18, 1.0],
             ).createShader(rect);
           },

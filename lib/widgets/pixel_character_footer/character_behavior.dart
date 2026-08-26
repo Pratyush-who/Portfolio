@@ -18,13 +18,16 @@ class BehaviorConfig {
     'Namaste',
     'Konichiwa',
     'Hire me',
-    'Duhh',
-    'GAY',
+    'Open to work',
+    'Naukri dedo naukri',
+    'Duhhh',
     ':)',
     'Hello qt',
-    'TMKC',
     'Hihihihihi',
+    'hue hue hue hue',
+    'huhhh?',
     'Sojao dost'
+
   ];
 
   static Duration walkDuration(Random rng) =>

@@ -7,6 +7,8 @@ import 'package:portfolioflutter/links.dart';
 import 'package:portfolioflutter/preload_service.dart';
 import 'package:portfolioflutter/project.dart';
 import 'package:portfolioflutter/techstack.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -161,6 +163,8 @@ class _HomePageState extends State<HomePage> {
                       );
                     },
                   ),
+                if (w > 800) const SizedBox(width: 16),
+                _ResumeButton(),
               ],
             ),
           ),
@@ -173,7 +177,11 @@ class _HomePageState extends State<HomePage> {
           children: [
             for (var i = 0; i < _builtCount; i++) ...[
               if (i > 0)
-                const Divider(color: Color(0xFF333333), thickness: 1, height: 1),
+                const Divider(
+                  color: Color(0xFF333333),
+                  thickness: 1,
+                  height: 1,
+                ),
               _buildSection(i),
             ],
           ],
@@ -208,7 +216,7 @@ class _HomePageState extends State<HomePage> {
     return RepaintBoundary(
       child: KeyedSubtree(
         key: _sectionKeys[index],
-        child: child,
+        child: child.animate().fadeIn(duration: 600.ms, curve: Curves.easeOut).slideY(begin: 0.05, end: 0, duration: 600.ms, curve: Curves.easeOut),
       ),
     );
   }
@@ -262,6 +270,45 @@ class _NavTagState extends State<_NavTag> {
               fontSize: 16,
               fontWeight: FontWeight.w600,
               letterSpacing: 0.5,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ResumeButton extends StatefulWidget {
+  @override
+  State<_ResumeButton> createState() => _ResumeButtonState();
+}
+
+class _ResumeButtonState extends State<_ResumeButton> {
+  bool _isHovering = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return MouseRegion(
+      onEnter: (_) => setState(() => _isHovering = true),
+      onExit: (_) => setState(() => _isHovering = false),
+      child: GestureDetector(
+        onTap: () {
+          launchUrl(Uri.parse('https://dub.sh/pratyush'));
+        },
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          decoration: BoxDecoration(
+            color: _isHovering ? const Color(0xFFFF6B35) : Colors.transparent,
+            border: Border.all(color: const Color(0xFFFF6B35), width: 1.5),
+            borderRadius: BorderRadius.circular(4),
+          ),
+          child: Text(
+            'Resume',
+            style: GoogleFonts.jetBrainsMono(
+              color: _isHovering ? Colors.black : const Color(0xFFFF6B35),
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
             ),
           ),
         ),
